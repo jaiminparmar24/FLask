@@ -67,7 +67,7 @@
             margin: 25px 0;
         }
 
-        .nav-btn {
+        .nav-btn, .nav-link-btn {
             background-color: #00ffcc;
             color: black;
             padding: 12px;
@@ -80,9 +80,10 @@
             gap: 10px;
             transition: background 0.3s ease;
             cursor: pointer;
+            text-decoration: none;
         }
 
-        .nav-btn:hover {
+        .nav-btn:hover, .nav-link-btn:hover {
             background-color: #00cc99;
         }
 
@@ -139,10 +140,13 @@
             font-weight: bold;
         }
 
-        .help-box p {
-            margin: 0;
-            font-size: 0.95rem;
+        .help-box a {
             color: #00ffcc;
+            text-decoration: none;
+        }
+
+        .help-box a:hover {
+            text-decoration: underline;
         }
 
         @media (max-width: 480px) {
@@ -154,7 +158,7 @@
                 font-size: 1.3rem;
             }
 
-            .nav-btn {
+            .nav-btn, .nav-link-btn {
                 font-size: 0.95rem;
             }
 
@@ -176,16 +180,16 @@
 
         <div class="nav-btns">
             <button class="nav-btn" onclick="toggleProfile()"><i class="fas fa-user"></i> Profile</button>
-            <button class="nav-btn"><i class="fas fa-cog"></i> Settings</button>
+            <a href="/settings" class="nav-link-btn"><i class="fas fa-cog"></i> Settings</a>
             <button class="nav-btn" onclick="toggleHelp()"><i class="fas fa-question-circle"></i> Help & Support</button>
-            <button class="nav-btn"><i class="fas fa-bell"></i> Notifications</button>
-            <button class="nav-btn"><i class="fas fa-chart-line"></i> Analytics</button>
-            <button class="nav-btn"><i class="fas fa-envelope"></i> Messages</button>
-            <button class="nav-btn"><i class="fas fa-users"></i> Users</button>
-            <button class="nav-btn"><i class="fas fa-database"></i> Data Backup</button>
-            <button class="nav-btn"><i class="fas fa-shield-alt"></i> Security</button>
-            <button class="nav-btn"><i class="fas fa-plug"></i> Integrations</button>
-            <button class="nav-btn" onclick="getLocation()"><i class="fas fa-map-marker-alt"></i> Show My Location</button>
+            <a href="/notifications" class="nav-link-btn"><i class="fas fa-bell"></i> Notifications</a>
+            <a href="/analytics" class="nav-link-btn"><i class="fas fa-chart-line"></i> Analytics</a>
+            <a href="/messages" class="nav-link-btn"><i class="fas fa-envelope"></i> Messages</a>
+            <a href="/users" class="nav-link-btn"><i class="fas fa-users"></i> Users</a>
+            <a href="/backup" class="nav-link-btn"><i class="fas fa-database"></i> Data Backup</a>
+            <a href="/security" class="nav-link-btn"><i class="fas fa-shield-alt"></i> Security</a>
+            <a href="/integrations" class="nav-link-btn"><i class="fas fa-plug"></i> Integrations</a>
+            <a class="nav-link-btn" onclick="getLocation()"><i class="fas fa-map-marker-alt"></i> Show My Location</a>
         </div>
 
         <div class="profile-box" id="profileBox">
@@ -199,7 +203,7 @@
         </div>
 
         <div class="help-box" id="helpBox">
-            <p><strong>Contact Email:</strong> jaiminparmar024@gmail.com</p>
+            <p><strong>Contact Email:</strong> <a href="mailto:jaiminparmar024@gmail.com">jaiminparmar024@gmail.com</a></p>
         </div>
 
         <a href="{{ url_for('logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -217,7 +221,11 @@
 
         function getLocation() {
             navigator.geolocation.getCurrentPosition((pos) => {
-                alert(`Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`);
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                window.location.href = `/mylocation?lat=${lat}&lon=${lon}`;
+            }, (error) => {
+                alert("Location permission denied or unavailable.");
             });
         }
 

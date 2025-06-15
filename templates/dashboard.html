@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -108,7 +106,7 @@
             background-color: #cc0000;
         }
 
-        .profile-box, .help-box {
+        .profile-box, .help-box, .ai-box {
             display: none;
             background: rgba(255, 255, 255, 0.1);
             padding: 15px;
@@ -197,7 +195,7 @@
             <a href="/security" class="nav-link-btn"><i class="fas fa-shield-alt"></i> Security</a>
             <a href="/integrations" class="nav-link-btn"><i class="fas fa-plug"></i> Integrations</a>
             <a class="nav-link-btn" onclick="getLocation()"><i class="fas fa-map-marker-alt"></i> Show My Location</a>
-            <a class="nav-link-btn" onclick="aiAssistant()"><i class="fas fa-robot"></i> AI Assistant</a>
+            <a class="nav-link-btn" onclick="toggleAIBox()"><i class="fas fa-robot"></i> AI Assistant</a>
         </div>
 
         <div class="profile-box" id="profileBox">
@@ -212,6 +210,13 @@
 
         <div class="help-box" id="helpBox">
             <p><strong>Contact Email:</strong> <a href="mailto:jaiminparmar024@gmail.com">jaiminparmar024@gmail.com</a></p>
+        </div>
+
+        <div class="ai-box" id="aiBox">
+            <p><strong>Ask AI Anything:</strong></p>
+            <input type="text" id="aiInput" placeholder="Type your question here" style="width: 100%; padding: 8px; border-radius: 6px;">
+            <button onclick="aiAssistant()" style="margin-top: 10px; padding: 8px 12px; background: #00ffcc; border: none; border-radius: 8px; cursor: pointer; color: black;">Ask</button>
+            <div id="aiResponse" style="margin-top: 10px; color: #ffffff;"></div>
         </div>
 
         <a href="{{ url_for('logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -252,8 +257,27 @@
             document.body.classList.toggle("dark-mode");
         }
 
-        function aiAssistant() {
-            alert("Hello! I'm your AI assistant. How can I help you today?");
+        function toggleAIBox() {
+            const box = document.getElementById("aiBox");
+            box.style.display = box.style.display === "none" ? "block" : "none";
+        }
+
+        async function aiAssistant() {
+            const input = document.getElementById("aiInput").value;
+            const responseBox = document.getElementById("aiResponse");
+            if (!input.trim()) return;
+            responseBox.innerHTML = "<i>Thinking...</i>";
+            try {
+                const res = await fetch("/ask-ai", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question: input })
+                });
+                const data = await res.json();
+                responseBox.innerHTML = data.response || "No response.";
+            } catch (err) {
+                responseBox.innerHTML = "Error contacting AI server.";
+            }
         }
     </script>
 </body>

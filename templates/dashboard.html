@@ -5,7 +5,6 @@
   <title>Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
   <style>
     body {
       margin: 0;
@@ -106,7 +105,7 @@
       background-color: #cc0000;
     }
 
-    .profile-box, .help-box, .ai-box {
+    .profile-box, .help-box {
       display: none;
       background: rgba(255, 255, 255, 0.1);
       padding: 15px;
@@ -195,7 +194,7 @@
       <a href="/security" class="nav-link-btn"><i class="fas fa-shield-alt"></i> Security</a>
       <a href="/integrations" class="nav-link-btn"><i class="fas fa-plug"></i> Integrations</a>
       <a class="nav-link-btn" onclick="getLocation()"><i class="fas fa-map-marker-alt"></i> Show My Location</a>
-      <a class="nav-link-btn" onclick="toggleAIBox()"><i class="fas fa-robot"></i> AI Assistant</a>
+      <button class="nav-btn" onclick="openReelsModal()"><i class="fas fa-video"></i> Watch Reels</button>
     </div>
 
     <div class="profile-box" id="profileBox">
@@ -212,14 +211,13 @@
       <p><strong>Contact Email:</strong> <a href="mailto:jaiminparmar024@gmail.com">jaiminparmar024@gmail.com</a></p>
     </div>
 
-    <div class="ai-box" id="aiBox">
-      <p><strong>Ask AI Anything:</strong></p>
-      <input type="text" id="aiInput" placeholder="Type your question here" style="width: 100%; padding: 8px; border-radius: 6px;">
-      <button onclick="aiAssistant()" style="margin-top: 10px; padding: 8px 12px; background: #00ffcc; border: none; border-radius: 8px; cursor: pointer; color: black;">Ask</button>
-      <div id="aiResponse" style="margin-top: 10px; color: #ffffff;"></div>
-    </div>
-
     <a href="{{ url_for('logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </div>
+
+  <!-- Reels Modal -->
+  <div id="reelsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:9999;">
+    <div class="reels-wrapper" id="reelsWrapper" style="max-width: 400px; margin: auto; height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; padding: 20px 0;"></div>
+    <button onclick="closeReelsModal()" style="position:absolute; top:10px; right:10px; background:red; color:white; border:none; padding:10px 15px; font-size:1rem; border-radius:8px;">Close</button>
   </div>
 
   <script>
@@ -257,29 +255,70 @@
       document.body.classList.toggle("dark-mode");
     }
 
-    function toggleAIBox() {
-      const box = document.getElementById("aiBox");
-      box.style.display = box.style.display === "none" ? "block" : "none";
+    const sampleReels = [
+      "https://www.w3schools.com/html/mov_bbb.mp4",
+      "https://media.w3.org/2010/05/sintel/trailer_hd.mp4",
+      "https://www.w3schools.com/html/movie.mp4"
+    ];
+
+    let currentReelCount = 0;
+    const maxReels = 100;
+    const reelsPerBatch = 20;
+
+    function createReel(index, url) {
+      const reel = document.createElement("div");
+      reel.style.cssText = "scroll-snap-align:start;width:100%;height:90vh;border-radius:10px;background:#111;position:relative;margin-bottom:20px;";
+
+      const video = document.createElement("video");
+      video.src = url;
+      video.setAttribute("muted", true);
+      video.setAttribute("loop", true);
+      video.setAttribute("playsinline", true);
+      video.setAttribute("preload", "none");
+      video.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:10px;";
+
+      const overlay = document.createElement("div");
+      overlay.textContent = `Reel #${index + 1}`;
+      overlay.style.cssText = "position:absolute;bottom:10px;left:10px;color:#fff;background:rgba(0,0,0,0.4);padding:8px 12px;border-radius:8px;font-size:0.9rem;";
+
+      reel.appendChild(video);
+      reel.appendChild(overlay);
+      document.getElementById("reelsWrapper").appendChild(reel);
+
+      observer.observe(video);
     }
 
-    async function aiAssistant() {
-      const input = document.getElementById("aiInput").value;
-      const responseBox = document.getElementById("aiResponse");
-      if (!input.trim()) return;
-      responseBox.innerHTML = "<i>Thinking...</i>";
-
-      try {
-        const res = await fetch("/ask-ai", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question: input })
-        });
-
-        const data = await res.json();
-        responseBox.innerHTML = data.response || "No response.";
-      } catch (err) {
-        responseBox.innerHTML = "⚠️ Error contacting AI server.";
+    function loadReelsBatch() {
+      for (let i = currentReelCount; i < currentReelCount + reelsPerBatch && i < maxReels; i++) {
+        createReel(i, sampleReels[i % sampleReels.length]);
       }
+      currentReelCount += reelsPerBatch;
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.play().catch(() => {});
+        } else {
+          entry.target.pause();
+        }
+      });
+    }, { threshold: 0.6 });
+
+    document.getElementById("reelsWrapper").addEventListener("scroll", () => {
+      const wrapper = document.getElementById("reelsWrapper");
+      if (wrapper.scrollTop + wrapper.clientHeight >= wrapper.scrollHeight - 10) {
+        loadReelsBatch();
+      }
+    });
+
+    function openReelsModal() {
+      document.getElementById("reelsModal").style.display = "block";
+      if (currentReelCount === 0) loadReelsBatch();
+    }
+
+    function closeReelsModal() {
+      document.getElementById("reelsModal").style.display = "none";
     }
   </script>
 </body>

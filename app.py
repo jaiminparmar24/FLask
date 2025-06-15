@@ -77,6 +77,9 @@ JAIMIN's Team 🚀
 # 📨 Login route
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    if session.get('logged_in'):
+        return redirect(url_for('dashboard'))
+
     if request.method == 'POST':
         email = request.form['email']
         last_login = get_last_login(email)
@@ -94,6 +97,9 @@ def login():
 # 🔐 OTP Verify route
 @app.route('/verify', methods=['GET', 'POST'])
 def verify():
+    if session.get('logged_in'):
+        return redirect(url_for('dashboard'))
+
     if request.method == 'POST':
         if 'resend' in request.form:
             send_otp(session.get('email'))

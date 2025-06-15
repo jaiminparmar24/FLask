@@ -3,7 +3,6 @@ from flask_mail import Mail, Message
 import random
 import os
 import time
-import google.generativeai as genai  # ✅ Gemini AI
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # 🔐 Session encryption
@@ -17,10 +16,6 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
 mail = Mail(app)
-
-# ✅ Gemini setup (Gemini Pro model)
-genai.configure(api_key="AIzaSyB1MaSGBSk0fZS3p2fV9ysQQzGnBIePgqU")
-model = genai.GenerativeModel('gemini-pro')
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -88,18 +83,6 @@ def dashboard():
 def logout():
     session.clear()
     return redirect(url_for('login'))
-
-# ✅ AI Assistant route
-@app.route('/ask-ai', methods=['POST'])
-def ask_ai():
-    data = request.get_json()
-    question = data.get("question", "")
-    try:
-        response = model.generate_content(question)
-        return jsonify({"response": response.text})
-    except Exception as e:
-        print("Gemini Error:", e)
-        return jsonify({"response": "⚠️ Error contacting AI server."})
 
 if __name__ == '__main__':
     app.run(debug=True)

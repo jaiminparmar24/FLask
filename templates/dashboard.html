@@ -105,7 +105,7 @@
       background-color: #cc0000;
     }
 
-    .profile-box, .help-box, .motivation-box {
+    .profile-box, .help-box {
       display: none;
       background: rgba(255, 255, 255, 0.1);
       padding: 15px;
@@ -151,6 +151,7 @@
       <button class="nav-btn" onclick="toggleProfile()"><i class="fas fa-user"></i> Profile</button>
       <button class="nav-btn" onclick="toggleHelp()"><i class="fas fa-question-circle"></i> Help & Support</button>
       <button class="nav-btn" onclick="getLocation()"><i class="fas fa-map-marker-alt"></i> Show My Location</button>
+      <button class="nav-btn" onclick="openCamera()"><i class="fas fa-camera"></i> Camera Fun</button>
     </div>
 
     <div class="profile-box" id="profileBox">
@@ -167,11 +168,15 @@
       <p><strong>Contact Email:</strong> <a href="mailto:jaiminparmar024@gmail.com">jaiminparmar024@gmail.com</a></p>
     </div>
 
-    <div class="motivation-box" id="motivationBox">
-      <!-- Quote will be loaded here -->
-    </div>
-
     <a href="{{ url_for('logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </div>
+
+  <!-- Camera Popup Box -->
+  <div id="cameraBox" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%);
+    background: rgba(0,0,0,0.9); padding:20px; border-radius:15px; z-index:999; box-shadow: 0 0 20px #00ffcc;">
+    <video id="video" autoplay width="300" style="border-radius:10px;"></video>
+    <br>
+    <button onclick="closeCamera()" style="margin-top:10px; padding:8px 16px; border:none; border-radius:8px; background:#ff4444; color:white;">Close</button>
   </div>
 
   <script>
@@ -209,41 +214,34 @@
       document.body.classList.toggle("dark-mode");
     }
 
-  async function loadMotivation() {
-  const box = document.getElementById("motivationBox");
-  box.style.display = "block";
-  box.innerHTML = "Loading motivation...";
+    function openCamera() {
+      const video = document.getElementById("video");
+      const cameraBox = document.getElementById("cameraBox");
 
-  try {
-    const res = await fetch("https://api.quotable.io/random");
-    const data = await res.json();
-    const quote = data.content;
-    const author = data.author;
-    const finalQuote = `"${quote}" — ${author}`;
-    box.innerHTML = `<strong>${quote}</strong><br>– ${author}`;
-
-    // Speak the quote
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(finalQuote);
-      utterance.rate = 1;
-      utterance.pitch = 1;
-      speechSynthesis.speak(utterance);
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+          video.srcObject = stream;
+          cameraBox.style.display = "block";
+        }).catch(function (err) {
+          alert("Camera access denied or not available.");
+        });
+      } else {
+        alert("Camera not supported by your browser.");
+      }
     }
 
-    // Save to localStorage
-    let history = JSON.parse(localStorage.getItem('motivationHistory')) || [];
-    history.unshift({ quote, author, date: new Date().toLocaleString() });
-    if (history.length > 10) history = history.slice(0, 10);
-    localStorage.setItem('motivationHistory', JSON.stringify(history));
+    function closeCamera() {
+      const video = document.getElementById("video");
+      const stream = video.srcObject;
 
-  } catch (err) {
-    box.innerHTML = "Could not fetch quote. Try again later.";
-  }
-}
+      if (stream) {
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+        video.srcObject = null;
+      }
 
-    window.onload = function () {
-      loadMotivation();
-    };
+      document.getElementById("cameraBox").style.display = "none";
+    }
   </script>
 </body>
 </html>

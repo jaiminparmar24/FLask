@@ -37,6 +37,7 @@
             width: 90%;
             max-width: 400px;
             text-align: center;
+            position: relative;
         }
 
         .header {
@@ -101,6 +102,49 @@
             background-color: #cc0000;
         }
 
+        .profile-box, .help-box {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+            text-align: left;
+        }
+
+        .profile-box label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .profile-box input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border: none;
+            background: #fff;
+            color: #000;
+        }
+
+        .profile-box button {
+            background: #00ffcc;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: black;
+            font-weight: bold;
+        }
+
+        .help-box p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #00ffcc;
+        }
+
         @media (max-width: 480px) {
             .card {
                 padding: 20px;
@@ -127,14 +171,13 @@
             <div class="clock" id="clock"></div>
         </div>
 
-        <img src="https://i.pravatar.cc/50" alt="User" style="border-radius: 50%; margin-bottom: 10px;">
         <p>You have successfully logged in using OTP.</p>
         <p><strong>Login Time:</strong> {{ session['login_time'] }}</p>
 
         <div class="nav-btns">
-            <button class="nav-btn" onclick="showProfile()"><i class="fas fa-user"></i> Profile</button>
+            <button class="nav-btn" onclick="toggleProfile()"><i class="fas fa-user"></i> Profile</button>
             <button class="nav-btn"><i class="fas fa-cog"></i> Settings</button>
-            <button class="nav-btn"><i class="fas fa-question-circle"></i> Help & Support</button>
+            <button class="nav-btn" onclick="toggleHelp()"><i class="fas fa-question-circle"></i> Help & Support</button>
             <button class="nav-btn"><i class="fas fa-bell"></i> Notifications</button>
             <button class="nav-btn"><i class="fas fa-chart-line"></i> Analytics</button>
             <button class="nav-btn"><i class="fas fa-envelope"></i> Messages</button>
@@ -143,6 +186,20 @@
             <button class="nav-btn"><i class="fas fa-shield-alt"></i> Security</button>
             <button class="nav-btn"><i class="fas fa-plug"></i> Integrations</button>
             <button class="nav-btn" onclick="getLocation()"><i class="fas fa-map-marker-alt"></i> Show My Location</button>
+        </div>
+
+        <div class="profile-box" id="profileBox">
+            <label>Email:</label>
+            <input type="email" value="{{ session['email'] }}" readonly>
+            <label>Name:</label>
+            <input type="text" placeholder="Enter your name">
+            <label>Phone:</label>
+            <input type="tel" placeholder="Enter phone number">
+            <button onclick="alert('Profile Updated')">Save</button>
+        </div>
+
+        <div class="help-box" id="helpBox">
+            <p><strong>Contact Email:</strong> jaiminparmar024@gmail.com</p>
         </div>
 
         <a href="{{ url_for('logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -164,8 +221,14 @@
             });
         }
 
-        function showProfile() {
-            alert("Welcome, {{ session['email'] }}");
+        function toggleProfile() {
+            const box = document.getElementById("profileBox");
+            box.style.display = box.style.display === "none" ? "block" : "none";
+        }
+
+        function toggleHelp() {
+            const box = document.getElementById("helpBox");
+            box.style.display = box.style.display === "none" ? "block" : "none";
         }
     </script>
 </body>

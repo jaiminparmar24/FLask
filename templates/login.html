@@ -1,109 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Email OTP Login</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <title>Email OTP Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        body {
-            background: url('https://images.unsplash.com/photo-1542281286-9e0a16bb7366') no-repeat center center fixed;
-            background-size: cover;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            animation: fadeIn 1.5s ease-in;
-        }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('https://images.unsplash.com/photo-1542281286-9e0a16bb7366') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      animation: fadeIn 1.5s ease-in;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
 
-        .container {
-            backdrop-filter: blur(15px);
-            background: rgba(255, 255, 255, 0.15);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 400px;
-            transition: transform 0.3s ease;
-            animation: slideUp 1s ease-out;
-        }
+    .container {
+      width: 90%;
+      max-width: 400px;
+      padding: 30px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      animation: slideUp 1s ease-out;
+    }
 
-        @keyframes slideUp {
-            from { transform: translateY(40px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
 
-        h2 {
-            text-align: center;
-            color: #222;
-            margin-bottom: 20px;
-            font-size: 1.6rem;
-        }
+    h2 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 20px;
+      font-size: 1.6rem;
+    }
 
-        input[type="email"] {
-            width: 100%;
-            padding: 14px;
-            margin: 12px 0;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            outline: none;
-        }
+    input[type="email"] {
+      width: 100%;
+      padding: 14px;
+      margin: 12px 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      outline: none;
+    }
 
-        button {
-            width: 100%;
-            background: #4CAF50;
-            color: white;
-            padding: 14px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
 
-        button:hover {
-            background: #45a049;
-        }
+    button:hover {
+      background: #45a049;
+    }
 
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+      }
 
-            h2 {
-                font-size: 1.3rem;
-            }
+      h2 {
+        font-size: 1.3rem;
+      }
 
-            input,
-            button {
-                font-size: 0.95rem;
-                padding: 12px;
-            }
-        }
-    </style>
+      input,
+      button {
+        font-size: 0.95rem;
+        padding: 12px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Send OTP to Email</h2>
-        <form method="post">
-            <input type="email" name="email" placeholder="Enter your email" required>
-            <button type="submit">Send OTP</button>
-        </form>
-    </div>
+  <div class="container">
+    <h2>Send OTP to Email</h2>
+    <form method="POST">
+      <input type="email" name="email" placeholder="Enter your email" required>
+      <button type="submit">Send OTP</button>
+    </form>
+  </div>
 </body>
 </html>

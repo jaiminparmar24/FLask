@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mail import Mail, Message
 import random
+import os
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # 🔐 For session handling
@@ -8,11 +9,8 @@ app.secret_key = 'supersecretkey'  # 🔐 For session handling
 # Email configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
-import os
-
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
@@ -26,8 +24,21 @@ def login():
         session['otp'] = otp
         session['email'] = email
 
-        msg = Message('Your OTP Code', sender=app.config['MAIL_USERNAME'], recipients=[email])
-        msg.body = f'Your OTP is {otp}'
+        # ✉️ Custom subject and body
+        msg = Message("JAIMIN'S Login Page", sender=app.config['MAIL_USERNAME'], recipients=[email])
+        msg.body = f'''
+Hello 👋,
+
+Welcome to JAIMIN'S secure login page.
+
+Your One-Time Password (OTP) is: 🔐 {otp}
+
+This OTP is valid for only one login attempt.
+If you didn’t request this, you can safely ignore this email.
+
+Best regards,  
+JAIMIN's Team 🚀
+'''
         mail.send(msg)
 
         return redirect(url_for('verify'))
@@ -47,7 +58,6 @@ def verify():
     return render_template('verify.html')
 
 
-# This is required for Render to detect the app
-# gunicorn will use: app:app
+# 🔁 For local development. Render uses gunicorn with app:app
 if __name__ == '__main__':
     app.run()

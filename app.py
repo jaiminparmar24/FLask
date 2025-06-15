@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# Email Configuration
+# 🔐 Email Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
@@ -19,7 +19,7 @@ app.config['MAIL_USE_SSL'] = False
 
 mail = Mail(app)
 
-# 📦 DB Setup (Run once to initialize users table)
+# 🛢️ Initialize DB
 def init_db():
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
@@ -33,7 +33,7 @@ def init_db():
 
 init_db()
 
-# ⏱️ Check last login
+# ⏱️ Get last login
 def get_last_login(email):
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
@@ -51,26 +51,15 @@ def update_last_login(email):
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
 
-@app.route('/', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        last_login = get_last_login(email)
+# ✉️ Send OTP function
+def send_otp(email):
+    otp = str(random.randint(100000, 999999))
+    session['otp'] = otp
+    session['otp_time'] = time.time()
+    session['email'] = email
 
-        if last_login and datetime.now() - last_login < timedelta(days=10):
-            # ✅ Allow auto-login without OTP
-            session['email'] = email
-            session['logged_in'] = True
-            return redirect(url_for('dashboard'))
-        else:
-            # ✉️ Send OTP if first time or after 10 days
-            otp = str(random.randint(100000, 999999))
-            session['otp'] = otp
-            session['otp_time'] = time.time()
-            session['email'] = email
-
-            msg = Message("JAIMIN'S Login Page", sender=app.config['MAIL_USERNAME'], recipients=[email])
-            msg.body = f'''
+    msg = Message("JAIMIN'S Login Page", sender=app.config['MAIL_USERNAME'], recipients=[email])
+    msg.body = f'''
 Hello 👋,
 
 Welcome to JAIMIN'S secure login page.
@@ -83,15 +72,33 @@ If you didn’t request this, you can safely ignore this email.
 Best regards,  
 JAIMIN's Team 🚀
 '''
-            mail.send(msg)
+    mail.send(msg)
+
+# 📨 Login route
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        last_login = get_last_login(email)
+
+        if last_login and datetime.now() - last_login < timedelta(days=10):
+            session['email'] = email
+            session['logged_in'] = True
+            return redirect(url_for('dashboard'))
+        else:
+            send_otp(email)
             return redirect(url_for('verify'))
 
     return render_template('login.html')
 
-
+# 🔐 OTP Verify route
 @app.route('/verify', methods=['GET', 'POST'])
 def verify():
     if request.method == 'POST':
+        if 'resend' in request.form:
+            send_otp(session.get('email'))
+            return redirect(url_for('verify'))
+
         user_otp = request.form['otp']
         otp_time = session.get('otp_time')
 
@@ -101,26 +108,28 @@ def verify():
 
         if user_otp == session.get('otp'):
             session['logged_in'] = True
-            update_last_login(session['email'])  # ✅ Update last login
-            return redirect(url_for('dashboard'))
+            update_last_login(session['email'])
+            return redirect(url_for('dashboard') + "?status=success")
         else:
             return "❌ Invalid OTP. Try again."
 
     return render_template('verify.html')
 
-
+# 📋 Dashboard
 @app.route('/dashboard')
 def dashboard():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-    return render_template('dashboard.html')
 
+    last_login = get_last_login(session['email'])
+    return render_template('dashboard.html', email=session['email'], last_login=last_login)
 
+# 🚪 Logout
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
 
-
+# 🚀 Start server
 if __name__ == '__main__':
     app.run(debug=True)

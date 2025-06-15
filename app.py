@@ -1,13 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_mail import Mail, Message
 import random
 import os
 import time
+import google.generativeai as genai  # ✅ Gemini AI
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # 🔐 For session handling
+app.secret_key = 'supersecretkey'  # 🔐 Session encryption
 
-# ✅ Email configuration (environment variables required)
+# ✅ Email config (env variables are better for safety)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')  # e.g., 'youremail@gmail.com'
@@ -17,9 +18,12 @@ app.config['MAIL_USE_SSL'] = False
 
 mail = Mail(app)
 
+# ✅ Gemini setup (Gemini Pro model)
+genai.configure(api_key="AIzaSyB1MaSGBSk0fZS3p2fV9ysQQzGnBIePgqU")
+model = genai.GenerativeModel('gemini-pro')
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
-    # ✅ Already logged in? Go to dashboard
     if session.get('logged_in'):
         return redirect(url_for('dashboard'))
 
@@ -29,6 +33,7 @@ def login():
         session['otp'] = otp
         session['otp_time'] = time.time()
         session['email'] = email
+        session['login_time'] = time.strftime('%Y-%m-%d %H:%M:%S')  # ⏱️ Store login time
 
         msg = Message("JAIMIN'S Login Page", sender=app.config['MAIL_USERNAME'], recipients=[email])
         msg.body = f'''
@@ -52,7 +57,6 @@ JAIMIN's Team 🚀
 
 @app.route('/verify', methods=['GET', 'POST'])
 def verify():
-    # ✅ If already logged in, skip to dashboard
     if session.get('logged_in'):
         return redirect(url_for('dashboard'))
 
@@ -60,8 +64,7 @@ def verify():
         user_otp = request.form['otp']
         otp_time = session.get('otp_time')
 
-        # ✅ Check expiry
-        if otp_time and time.time() - otp_time > 300:  # 5 minutes = 300 sec
+        if otp_time and time.time() - otp_time > 300:
             session.pop('otp', None)
             return "⏰ OTP expired. Please login again."
 
@@ -76,7 +79,6 @@ def verify():
 
 @app.route('/dashboard')
 def dashboard():
-    # ✅ Only allow if logged in
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     return render_template('dashboard.html')
@@ -87,7 +89,17 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+# ✅ AI Assistant route
+@app.route('/ask-ai', methods=['POST'])
+def ask_ai():
+    data = request.get_json()
+    question = data.get("question", "")
+    try:
+        response = model.generate_content(question)
+        return jsonify({"response": response.text})
+    except Exception as e:
+        print("Gemini Error:", e)
+        return jsonify({"response": "⚠️ Error contacting AI server."})
 
-# 🔁 For local testing
 if __name__ == '__main__':
     app.run(debug=True)

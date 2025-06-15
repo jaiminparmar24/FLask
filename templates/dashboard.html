@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -78,6 +78,7 @@
             align-items: center;
             gap: 10px;
             transition: background 0.3s ease;
+            cursor: pointer;
         }
 
         .nav-btn:hover {
@@ -126,11 +127,12 @@
             <div class="clock" id="clock"></div>
         </div>
 
-        <p>Welcome, <strong>{{ session['email'] }}</strong></p>
+        <img src="https://i.pravatar.cc/50" alt="User" style="border-radius: 50%; margin-bottom: 10px;">
         <p>You have successfully logged in using OTP.</p>
+        <p><strong>Login Time:</strong> {{ session['login_time'] }}</p>
 
         <div class="nav-btns">
-            <button class="nav-btn"><i class="fas fa-user"></i> Profile</button>
+            <button class="nav-btn" onclick="showProfile()"><i class="fas fa-user"></i> Profile</button>
             <button class="nav-btn"><i class="fas fa-cog"></i> Settings</button>
             <button class="nav-btn"><i class="fas fa-question-circle"></i> Help & Support</button>
             <button class="nav-btn"><i class="fas fa-bell"></i> Notifications</button>
@@ -140,6 +142,7 @@
             <button class="nav-btn"><i class="fas fa-database"></i> Data Backup</button>
             <button class="nav-btn"><i class="fas fa-shield-alt"></i> Security</button>
             <button class="nav-btn"><i class="fas fa-plug"></i> Integrations</button>
+            <button class="nav-btn" onclick="getLocation()"><i class="fas fa-map-marker-alt"></i> Show My Location</button>
         </div>
 
         <a href="{{ url_for('logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -149,10 +152,21 @@
         function updateClock() {
             const now = new Date();
             const timeString = now.toLocaleTimeString();
-            document.getElementById('clock').textContent = timeString;
+            const dateString = now.toLocaleDateString();
+            document.getElementById('clock').textContent = dateString + ' ' + timeString;
         }
         setInterval(updateClock, 1000);
-        updateClock(); // Initial call
+        updateClock();
+
+        function getLocation() {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                alert(`Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`);
+            });
+        }
+
+        function showProfile() {
+            alert("Welcome, {{ session['email'] }}");
+        }
     </script>
 </body>
 </html>

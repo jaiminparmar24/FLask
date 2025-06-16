@@ -96,10 +96,10 @@ def login():
 
     if request.method == 'POST':
         email = request.form['email']
-        last_login = get_last_login(email)
+        session['email'] = email
 
-        if last_login and datetime.now() - last_login < timedelta(days=10):
-            session['email'] = email
+        if session.get('verified') and session.get('email') == email:
+            # User has verified OTP already in this session
             session['logged_in'] = True
             return redirect(url_for('dashboard'))
         else:
@@ -127,6 +127,7 @@ def verify():
             return render_template('verify.html', error="⏰ OTP expired. Please login again.")
 
         if user_otp == session.get('otp'):
+            session['verified'] = True  # Mark this session as OTP verified
             session['logged_in'] = True
             update_last_login(session['email'])
             return redirect(url_for('dashboard') + "?status=success")
@@ -147,8 +148,9 @@ def dashboard():
 # 🚪 Logout
 @app.route('/logout')
 def logout():
-    session.clear()
+    session.clear()  # Remove verified and logged_in
     return redirect(url_for('login'))
+
 
 # 🚀 Start server
 if __name__ == '__main__':

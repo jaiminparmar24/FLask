@@ -58,38 +58,37 @@ def send_otp(email):
     session['otp'] = otp
     session['otp_time'] = time.time()
     session['email'] = email
+    session['otp_attempts'] = 0  # reset attempt counter
 
     msg = Message(
-        subject="Login OTP - JAIMIN",
+        subject="🔐 Your OTP for JAIMIN's Login",
         recipients=[email],
-        sender=("JAIMIN's Login", app.config['MAIL_USERNAME'])
+        reply_to="noreply@example.com",
+        extra_headers={"X-Priority": "1", "X-MSMail-Priority": "High"}
     )
 
-    msg.body = f'''
-Hello,
+    msg.body = f"Your OTP is: {otp}"  # fallback for plain text readers
 
-Your OTP is: {otp}
-
-This code is valid for 5 minutes.
-'''
-
-    msg.html = f'''
+    msg.html = f"""
     <html>
       <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-        <div style="background-color: #fff; padding: 20px; border-radius: 10px;">
-          <h2 style="color: #333;">👋 Welcome to JAIMIN's Login</h2>
-          <p>Here's your <strong>One-Time Password (OTP)</strong>:</p>
-          <h1 style="color: #007BFF;">{otp}</h1>
-          <p>This OTP is valid for <strong>5 minutes</strong> and only one login attempt.</p>
-          <hr>
-          <small>If you did not request this login, you can safely ignore this email.</small><br><br>
-          <p style="color: #888;">– JAIMIN's Team 🚀</p>
+        <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px;">
+          <h2 style="color: #4CAF50;">🔐 JAIMIN Login Verification</h2>
+          <p>Hi there 👋,</p>
+          <p>You requested a One-Time Password (OTP) to log in.</p>
+          <h1 style="background: #222; color: #fff; padding: 10px 20px; border-radius: 8px; display: inline-block;">{otp}</h1>
+          <p>This OTP will expire in <strong>5 minutes</strong> and can only be used once.</p>
+          <p>If you didn’t request this, you can safely ignore this email.</p>
+          <br>
+          <p style="color: #888;">— JAIMIN's Secure Login Team 🚀</p>
         </div>
       </body>
     </html>
-    '''
+    """
 
     mail.send(msg)
+
+
 
 # 📨 Login route
 @app.route('/', methods=['GET', 'POST'])

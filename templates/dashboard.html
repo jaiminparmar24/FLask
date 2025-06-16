@@ -117,7 +117,8 @@
 </head>
 <body>
   <div class="container">
-    <h2><i class="fas fa-user-circle"></i> Welcome, {{ session['email'] }}</h2>
+ <h2><i class="fas fa-user-circle"></i> Welcome,<br><span style="font-size: 0.9rem;">{{ session['email'] }}</span></h2>
+
     <div class="clock" id="clock"></div>
     <p><strong>Login Time:</strong> {{ session['login_time'] }}</p>
 

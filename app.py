@@ -9,13 +9,13 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# 🔐 Gmail Email Configuration (avoid spam by SPF/DKIM setup)
+# 🔐 Gmail Email Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')  # Your Gmail address
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')  # Your Gmail App Password
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')  # Gmail App Password
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
 
 mail = Mail(app)
@@ -52,13 +52,13 @@ def update_last_login(email):
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
 
-# ✉️ Send OTP function
+# ✉️ Send OTP
 def send_otp(email):
     otp = str(random.randint(100000, 999999))
     session['otp'] = otp
     session['otp_time'] = time.time()
     session['email'] = email
-    session['otp_attempts'] = 0  # reset attempt counter
+    session['otp_attempts'] = 0
 
     msg = Message(
         subject="🔐 Your OTP for JAIMIN's Login",
@@ -67,7 +67,7 @@ def send_otp(email):
         extra_headers={"X-Priority": "1", "X-MSMail-Priority": "High"}
     )
 
-    msg.body = f"Your OTP is: {otp}"  # fallback for plain text readers
+    msg.body = f"Your OTP is: {otp}"
 
     msg.html = f"""
     <html>
@@ -87,8 +87,6 @@ def send_otp(email):
     """
 
     mail.send(msg)
-
-
 
 # 📨 Login route
 @app.route('/', methods=['GET', 'POST'])
@@ -126,16 +124,14 @@ def verify():
 
         if not session.get('otp') or time.time() - otp_time > 300:
             session.pop('otp', None)
-           return render_template('verify.html', error="⏰ OTP expired. Please login again.")
-
+            return render_template('verify.html', error="⏰ OTP expired. Please login again.")
 
         if user_otp == session.get('otp'):
             session['logged_in'] = True
             update_last_login(session['email'])
             return redirect(url_for('dashboard') + "?status=success")
-       else:
-    return render_template('verify.html', error="Invalid OTP. Please try again! 🔐")
-
+        else:
+            return render_template('verify.html', error="Invalid OTP. Please try again! 🔐")
 
     return render_template('verify.html')
 

@@ -4,12 +4,8 @@
   <meta charset="UTF-8">
   <title>Welcome | JAIMIN LOGIN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       padding: 0;
@@ -83,24 +79,43 @@
     }
 
     @media (max-width: 480px) {
-      .card {
-        padding: 25px;
-      }
-
-      .logo {
-        font-size: 1.5rem;
-      }
+      .card { padding: 25px; }
+      .logo { font-size: 1.5rem; }
     }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="logo">LOGIN</div>
-    <form method="POST">
-      <input type="email" name="email" placeholder="Enter your email" required>
+    <form onsubmit="sendToSheet(event)">
+      <input type="email" id="email" placeholder="Enter your email" required>
       <button type="submit">🔐 Send OTP</button>
     </form>
     <div class="footer">Safe • Secure • Fast Login</div>
   </div>
+
+  <script>
+    function sendToSheet(e) {
+      e.preventDefault(); // stop form from submitting normally
+      const email = document.getElementById('email').value;
+
+      fetch('https://script.google.com/macros/s/AKfycbzJ97O5gRgG-STCcQhQ2_b63h6dqQ_o4D1NxnbBcfbRBHNjTdLnEyJfEePjbyaNTxv7/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+      .then(response => {
+        if (response.ok) {
+          alert("✅ Email sent to Google Sheet!");
+        } else {
+          alert("❌ Failed to submit.");
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert("⚠️ Error occurred.");
+      });
+    }
+  </script>
 </body>
 </html>

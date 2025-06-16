@@ -126,12 +126,28 @@
       .logo { font-size: 1.5rem; }
       #timer { font-size: 0.9rem; }
     }
+    @keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="logo">OTP Verification</div>
-    <form method="POST">
+<div class="card">
+  <div class="logo">OTP Verification</div>
+
+  {% if error %}
+    <div style="background-color: #ff4d4d; color: white; padding: 15px; border-radius: 8px; text-align: center; font-size: 18px; margin-bottom: 20px; animation: shake 0.3s;">
+      ❌ {{ error }}
+    </div>
+  {% endif %}
+
+  <form method="POST">
+
       <input type="text" name="otp" id="otpInput" placeholder="Enter OTP from email" required>
       <button type="submit" id="verifyBtn">✅ Verify OTP</button>
       <button type="submit" name="resend" id="resendBtn" disabled>🔁 Resend OTP</button>

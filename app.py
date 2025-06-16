@@ -59,20 +59,36 @@ def send_otp(email):
     session['otp_time'] = time.time()
     session['email'] = email
 
-    msg = Message("JAIMIN'S Login Page", recipients=[email])
+    msg = Message(
+        subject="Login OTP - JAIMIN",
+        recipients=[email],
+        sender=("JAIMIN's Login", app.config['MAIL_USERNAME'])
+    )
+
     msg.body = f'''
-Hello 👋,
+Hello,
 
-Welcome to JAIMIN'S secure login page.
+Your OTP is: {otp}
 
-Your One-Time Password (OTP) is: 🔐 {otp}
-
-This OTP is valid for only one login attempt and expires in 5 minutes.
-If you didn’t request this, you can safely ignore this email.
-
-Best regards,  
-JAIMIN's Team 🚀
+This code is valid for 5 minutes.
 '''
+
+    msg.html = f'''
+    <html>
+      <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+        <div style="background-color: #fff; padding: 20px; border-radius: 10px;">
+          <h2 style="color: #333;">👋 Welcome to JAIMIN's Login</h2>
+          <p>Here's your <strong>One-Time Password (OTP)</strong>:</p>
+          <h1 style="color: #007BFF;">{otp}</h1>
+          <p>This OTP is valid for <strong>5 minutes</strong> and only one login attempt.</p>
+          <hr>
+          <small>If you did not request this login, you can safely ignore this email.</small><br><br>
+          <p style="color: #888;">– JAIMIN's Team 🚀</p>
+        </div>
+      </body>
+    </html>
+    '''
+
     mail.send(msg)
 
 # 📨 Login route

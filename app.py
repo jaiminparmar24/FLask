@@ -126,14 +126,16 @@ def verify():
 
         if not session.get('otp') or time.time() - otp_time > 300:
             session.pop('otp', None)
-            return "⏰ OTP expired. Please login again."
+           return render_template('verify.html', error="⏰ OTP expired. Please login again.")
+
 
         if user_otp == session.get('otp'):
             session['logged_in'] = True
             update_last_login(session['email'])
             return redirect(url_for('dashboard') + "?status=success")
-        else:
-            return "❌ Invalid OTP. Try again."
+       else:
+    return render_template('verify.html', error="Invalid OTP. Please try again! 🔐")
+
 
     return render_template('verify.html')
 

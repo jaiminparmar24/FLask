@@ -73,7 +73,7 @@ def send_otp(email):
     <html>
       <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
         <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px;">
-          <h2 style="color: #4CAF50;">🔐 JAIMIN Login Verification</h2>
+          <h2 style="color: #4CAF50;">🔐 Login Verification By JAIMIN</h2>
           <p>Hi there 👋,</p>
           <p>You requested a One-Time Password (OTP) to log in.</p>
           <h1 style="background: #222; color: #fff; padding: 10px 20px; border-radius: 8px; display: inline-block;">{otp}</h1>

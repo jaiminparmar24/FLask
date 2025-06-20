@@ -1,1 +1,1 @@
-FlaskFlask-Mailgspreadoauth2clientgunicorn
+FlaskFlask-Mailrequestsgunicorn

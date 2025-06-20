@@ -4,22 +4,13 @@ import random
 import os
 import time
 import sqlite3
-from datetime import datetime, timedelta
-
-# ✅ Google Sheets Integration
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-
-# Google Sheets Setup
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("google_creds.json", scope)
-client = gspread.authorize(creds)
-sheet = client.open("LoginRecords").sheet1  # 🔁 Replace with your sheet name if different
+import requests
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# 🔐 Gmail Email Configuration
+# 📧 Gmail SMTP Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -30,7 +21,7 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
 
 mail = Mail(app)
 
-# 🛢️ Initialize DB
+# 🗃️ Initialize SQLite Database
 def init_db():
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
@@ -44,17 +35,15 @@ def init_db():
 
 init_db()
 
-# ⏱️ Get last login
+# 🕒 Fetch Last Login from DB
 def get_last_login(email):
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
         c.execute("SELECT last_login FROM users WHERE email = ?", (email,))
         row = c.fetchone()
-        if row and row[0]:
-            return datetime.fromisoformat(row[0])
-        return None
+        return datetime.fromisoformat(row[0]) if row and row[0] else None
 
-# 🔄 Update last login
+# 📥 Update Last Login to DB
 def update_last_login(email):
     now = datetime.now().isoformat()
     with sqlite3.connect('users.db') as conn:
@@ -62,12 +51,21 @@ def update_last_login(email):
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
 
-# ✍️ Write login to Google Sheet
-def log_to_google_sheet(email, status):
+# 🌐 Log Login to Google Sheet via Apps Script
+def send_to_google_script(email, status):
+    url = "https://script.google.com/macros/s/AKfycbwAD7PDD28MAsqRYiQIJZdSW4NqgGa78KLbMZvI1MoS7mLQozQIFPqdwcrtTTP8aYWP/exec"
     time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    sheet.append_row([email, time_now, status])
+    data = {
+        "email": email,
+        "time": time_now,
+        "status": status
+    }
+    try:
+        requests.post(url, json=data)
+    except Exception as e:
+        print("❌ Failed to log to Google Sheet:", e)
 
-# ✉️ Send OTP
+# 🔐 Generate and Email OTP
 def send_otp(email):
     otp = str(random.randint(100000, 999999))
     session['otp'] = otp
@@ -78,20 +76,17 @@ def send_otp(email):
     msg = Message(
         subject="🔐 Your OTP for JAIMIN's Login",
         recipients=[email],
-        reply_to="noreply@example.com",
-        extra_headers={"X-Priority": "1", "X-MSMail-Priority": "High"}
+        reply_to="noreply@example.com"
     )
 
     msg.body = f"Your OTP is: {otp}"
-
     msg.html = f"""
     <html>
       <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
         <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px;">
           <h2 style="color: #4CAF50;">🔐 Login Verification By JAIMIN</h2>
-          <p>Hi there 👋,</p>
           <p>You requested a One-Time Password (OTP) to log in.</p>
-          <h1 style="background: #222; color: #fff; padding: 10px 20px; border-radius: 8px; display: inline-block;">{otp}</h1>
+          <h1 style="background: #222; color: #fff; padding: 10px 20px; border-radius: 8px;">{otp}</h1>
           <p>This OTP will expire in <strong>5 minutes</strong> and can only be used once.</p>
           <p>If you didn’t request this, you can safely ignore this email.</p>
           <br>
@@ -103,7 +98,7 @@ def send_otp(email):
 
     mail.send(msg)
 
-# 📨 Login route
+# 📨 Login Route
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
@@ -122,7 +117,7 @@ def login():
 
     return render_template('login.html')
 
-# 🔐 OTP Verify route
+# ✅ OTP Verification Route
 @app.route('/verify', methods=['GET', 'POST'])
 def verify():
     if session.get('logged_in'):
@@ -144,14 +139,14 @@ def verify():
             session['verified'] = True
             session['logged_in'] = True
             update_last_login(session['email'])
-            log_to_google_sheet(session['email'], "Success")  # ✅ Log to Google Sheet
+            send_to_google_script(session['email'], "Success")
             return redirect(url_for('dashboard') + "?status=success")
         else:
             return render_template('verify.html', error="Invalid OTP. Please try again! 🔐")
 
     return render_template('verify.html')
 
-# 📋 Dashboard
+# 📋 Dashboard Route
 @app.route('/dashboard')
 def dashboard():
     if not session.get('logged_in'):
@@ -160,12 +155,12 @@ def dashboard():
     last_login = get_last_login(session['email'])
     return render_template('dashboard.html', email=session['email'], last_login=last_login)
 
-# 🚪 Logout
+# 🚪 Logout Route
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# 🚀 Start server
+# 🚀 Run Server
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,1 +1,1 @@
-Flask==3.1.1Flask-Mail==0.10.0gunicorn==23.0.0requests==2.32.4twilio==9.6.3
+FlaskFlask-Mailgspreadoauth2client

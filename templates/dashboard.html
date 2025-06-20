@@ -117,10 +117,9 @@
 </head>
 <body>
   <div class="container">
- <h2><i class="fas fa-user-circle"></i> Welcome,<br><span style="font-size: 0.9rem;">{{ session['email'] }}</span></h2>
+    <h2><i class="fas fa-user-circle"></i> Welcome,<br><span style="font-size: 0.9rem;">{{ session['email'] }}</span></h2>
 
     <div class="clock" id="clock"></div>
-    <p><strong>Login Time:</strong> {{ session['login_time'] }}</p>
 
     <button onclick="toggleSection('profileBox')"><i class="fas fa-user"></i> Profile</button>
     <button onclick="toggleSection('helpBox')"><i class="fas fa-question-circle"></i> Help & Support</button>
@@ -195,11 +194,4 @@
       const video = document.getElementById("video");
       const stream = video.srcObject;
       if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-        video.srcObject = null;
-      }
-      document.getElementById("cameraPopup").style.display = "none";
-    }
-  </script>
-</body>
-</html>
+        strea

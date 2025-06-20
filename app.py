@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mail import Mail, Message
-from pytz import timezone
+
 import random
 import os
 import time
@@ -54,20 +54,15 @@ def update_last_login(email):
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
 
-# 🌍 Send to Google Sheet (with IST Time)
+# 🌍 Send to Google Sheet
+# 🌍 Send to Google Sheet (Only email, time, and status)
 def send_to_google_script(email, status, logout=False):
     url = "https://script.google.com/macros/s/AKfycbwAD7PDD28MAsqRYiQIJZdSW4NqgGa78KLbMZvI1MoS7mLQozQIFPqdwcrtTTP8aYWP/exec"  # Replace with actual deployed script URL
-    
-    ist = timezone('Asia/Kolkata')
     login_time = session.get('login_time')
-    if not login_time:
-        login_time = datetime.now(ist)
-    else:
-        login_time = login_time.astimezone(ist)
-
+    
     data = {
         "email": email,
-        "time": login_time.strftime("%Y-%m-%d %H:%M:%S"),
+        "time": (login_time or datetime.now()).strftime("%Y-%m-%d %H:%M:%S"),
         "status": status
     }
 

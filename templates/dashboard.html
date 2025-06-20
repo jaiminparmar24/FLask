@@ -11,13 +11,14 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      background: linear-gradient(to right, #314755, #26a0da);
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
       animation: fadeIn 1s ease-in;
+      overflow: hidden;
     }
 
     @keyframes fadeIn {
@@ -47,6 +48,13 @@
       color: #00ffff;
     }
 
+    .greeting {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: #ffd700;
+      font-weight: bold;
+    }
+
     .clock {
       font-size: 0.9rem;
       margin-bottom: 20px;
@@ -54,25 +62,30 @@
     }
 
     button, .btn {
-      background: #00ffff;
-      color: #000;
+      background: rgba(0, 255, 255, 0.1);
+      color: #00ffff;
       padding: 12px;
       margin: 10px 0;
-      border: none;
+      border: 1px solid #ffffff;
       width: 100%;
       font-size: 1rem;
       border-radius: 10px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: all 0.3s ease;
       text-decoration: none;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     }
 
     button:hover, .btn:hover {
-      background: #00cccc;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
     }
 
     .logout {
@@ -113,22 +126,23 @@
         font-size: 0.95rem;
       }
     }
+      button:active, .btn:active {
+      transform: scale(0.97);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2><i class="fas fa-user-circle"></i> Welcome,<br><span style="font-size: 0.9rem;">{{ session['email'] }}</span></h2>
-
+    <h2 style="font-size: 2rem;"><i class="fas fa-user-circle"></i> Welcome<br><span style="font-size: 0.9rem;">{{ session['email'] }}</span></h2>
+    <div class="greeting" id="greetingText"></div>
     <div class="clock" id="clock"></div>
-
     <button onclick="toggleSection('profileBox')"><i class="fas fa-user"></i> Profile</button>
-    <button onclick="toggleSection('helpBox')"><i class="fas fa-question-circle"></i> Help & Support</button>
-    <button onclick="getLocation()"><i class="fas fa-map-marker-alt"></i> Show My Location</button>
     <button onclick="openCamera()"><i class="fas fa-camera"></i> Camera</button>
+    <button onclick="getLocation()"><i class="fas fa-map-marker-alt"></i> Show My Location</button>
+    <button onclick="toggleSection('helpBox')"><i class="fas fa-question-circle"></i> Help & Support</button>
     <button onclick="toggleDarkMode()"><i class="fas fa-moon"></i> Toggle Dark Mode</button>
     <a href="{{ url_for('logout') }}" class="btn logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-
-    <!-- Profile Box -->
     <div class="section-box" id="profileBox">
       <label>Email:</label>
       <input type="email" value="{{ session['email'] }}" readonly>
@@ -138,20 +152,17 @@
       <input type="tel" placeholder="Enter phone number">
       <button onclick="alert('✅ Profile Saved!')">Save</button>
     </div>
-
-    <!-- Help Box -->
     <div class="section-box" id="helpBox">
       <p>Need help? Contact: <a href="mailto:jaiminparmar024@gmail.com" style="color:#00ffff;">jaiminparmar024@gmail.com</a></p>
     </div>
   </div>
-
-  <!-- Camera Box -->
-  <div id="cameraPopup" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%);
-       background:#000; padding:20px; border-radius:15px; z-index:999; box-shadow:0 0 20px #00ffff;">
+  <div id="cameraPopup" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:#000; padding:20px; border-radius:15px; z-index:999; box-shadow:0 0 20px #00ffff;">
     <video id="video" autoplay width="300" style="border-radius:10px;"></video><br>
-    <button onclick="closeCamera()" style="margin-top:10px;">Close</button>
+    <button onclick="capturePhoto()" style="margin-top:10px;"><i class='fas fa-camera-retro'></i> Capture Photo</button>
+    <a id="downloadLink" style="display:none; margin-top:10px;" download="capture.png" class="btn"><i class='fas fa-download'></i> Download</a>
+    <button onclick="closeCamera()" style="margin-top:10px;" class="btn"><i class='fas fa-times'></i> Close</button>
   </div>
-
+  </div>
   <script>
     function updateClock() {
       const now = new Date();
@@ -181,7 +192,6 @@
     function openCamera() {
       const video = document.getElementById("video");
       const box = document.getElementById("cameraPopup");
-
       navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => {
           video.srcObject = stream;
@@ -194,4 +204,41 @@
       const video = document.getElementById("video");
       const stream = video.srcObject;
       if (stream) {
-        strea
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+        video.srcObject = null;
+      }
+      document.getElementById("cameraPopup").style.display = "none";
+    }
+
+    function displayGreeting() {
+      const hour = new Date().getHours();
+      let greeting = "";
+      if (hour < 12) greeting = "Good Morning";
+      else if (hour < 18) greeting = "Good Afternoon";
+      else greeting = "Good Evening";
+      document.getElementById("greetingText").textContent = `${greeting}, JAIMIN!`;
+    }
+
+    window.addEventListener('load', () => {
+      displayGreeting();
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+        document.body.style.background = "#121212";
+      }
+    });
+  function capturePhoto() {
+  const video = document.getElementById("video");
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const dataURL = canvas.toDataURL("image/png");
+  const link = document.getElementById("downloadLink");
+  link.href = dataURL;
+  link.style.display = "inline-block";
+}
+</script>
+</body>
+</html>

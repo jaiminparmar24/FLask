@@ -7,13 +7,9 @@ import time
 import sqlite3
 import requests
 from datetime import datetime
-from pytz import timezone
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
-
-# ⏱️ India timezone
-india = timezone('Asia/Kolkata')
 
 # 🔐 Gmail Email Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -47,12 +43,12 @@ def get_last_login(email):
         c.execute("SELECT last_login FROM users WHERE email = ?", (email,))
         row = c.fetchone()
         if row and row[0]:
-            return datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S')  # ✅ fixed format
+            return datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S')
         return None
 
 # 🔄 Update last login
 def update_last_login(email):
-    now = datetime.now(india).strftime('%Y-%m-%d %H:%M:%S')  # ✅ no timezone info
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
@@ -65,7 +61,7 @@ def send_to_google_script(email, status):
 
     data = {
         "email": email,
-        "time": (login_time or datetime.now(india)).strftime("%Y-%m-%d %H:%M:%S"),
+        "time": (login_time or datetime.now()).strftime("%Y-%m-%d %H:%M:%S"),
         "status": status
     }
 
@@ -149,7 +145,7 @@ def verify():
         if user_otp == session.get('otp'):
             session['verified'] = True
             session['logged_in'] = True
-            session['login_time'] = datetime.now(india)
+            session['login_time'] = datetime.now()
             session['ip'] = request.remote_addr
             session['browser'] = request.user_agent.string
             update_last_login(session['email'])

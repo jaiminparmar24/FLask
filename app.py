@@ -6,6 +6,16 @@ import time
 import sqlite3
 from datetime import datetime, timedelta
 
+# ✅ Google Sheets Integration
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+# Google Sheets Setup
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name("google_creds.json", scope)
+client = gspread.authorize(creds)
+sheet = client.open("LoginRecords").sheet1  # 🔁 Replace with your sheet name if different
+
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
@@ -14,8 +24,8 @@ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')  # Your Gmail address
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')  # Gmail App Password
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
 
 mail = Mail(app)
@@ -51,6 +61,11 @@ def update_last_login(email):
         c = conn.cursor()
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
+
+# ✍️ Write login to Google Sheet
+def log_to_google_sheet(email, status):
+    time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    sheet.append_row([email, time_now, status])
 
 # ✉️ Send OTP
 def send_otp(email):
@@ -99,7 +114,6 @@ def login():
         session['email'] = email
 
         if session.get('verified') and session.get('email') == email:
-            # User has verified OTP already in this session
             session['logged_in'] = True
             return redirect(url_for('dashboard'))
         else:
@@ -127,9 +141,10 @@ def verify():
             return render_template('verify.html', error="⏰ OTP expired. Please login again.")
 
         if user_otp == session.get('otp'):
-            session['verified'] = True  # Mark this session as OTP verified
+            session['verified'] = True
             session['logged_in'] = True
             update_last_login(session['email'])
+            log_to_google_sheet(session['email'], "Success")  # ✅ Log to Google Sheet
             return redirect(url_for('dashboard') + "?status=success")
         else:
             return render_template('verify.html', error="Invalid OTP. Please try again! 🔐")
@@ -148,9 +163,8 @@ def dashboard():
 # 🚪 Logout
 @app.route('/logout')
 def logout():
-    session.clear()  # Remove verified and logged_in
+    session.clear()
     return redirect(url_for('login'))
-
 
 # 🚀 Start server
 if __name__ == '__main__':

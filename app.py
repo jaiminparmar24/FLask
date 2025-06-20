@@ -47,19 +47,16 @@ def get_last_login(email):
         c.execute("SELECT last_login FROM users WHERE email = ?", (email,))
         row = c.fetchone()
         if row and row[0]:
-            return datetime.fromisoformat(row[0])
+            return datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S')  # ✅ fixed format
         return None
 
 # 🔄 Update last login
-def get_last_login(email):
+def update_last_login(email):
+    now = datetime.now(india).strftime('%Y-%m-%d %H:%M:%S')  # ✅ no timezone info
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
-        c.execute("SELECT last_login FROM users WHERE email = ?", (email,))
-        row = c.fetchone()
-        if row and row[0]:
-            return datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S')  # ✅ fixed
-        return None
-
+        c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
+        conn.commit()
 
 # 🌍 Send to Google Sheet (email, time, status only)
 def send_to_google_script(email, status):

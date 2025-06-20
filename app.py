@@ -43,15 +43,18 @@ def update_last_login(email):
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
 
-# 🌍 Send login/logout details to Google Sheet
+# 🌍 Send login/logout to Google Sheet
 def send_to_google_script(email, status, logout=False):
-    url = "https://script.google.com/macros/s/AKfycbwAD7PDD28MAsqRYiQIJZdSW4NqgGa78KLbMZvI1MoS7mLQozQIFPqdwcrtTTP8aYWP/exec"
+    url = "https://script.google.com/macros/s/AKfycbwAD7PDD28MAsqRYiQIJZdSW4NqgGa78KLbMZvI1MoS7mLQozQIFPqdwcrtTTP8aYWP/exec"  # Replace this
     login_time = session.get('login_time')
     logout_time = datetime.now() if logout else None
     duration = ""
 
     if login_time and logout_time:
-        duration = str(logout_time - login_time).split('.')[0]
+        try:
+            duration = str(logout_time - login_time).split('.')[0]
+        except:
+            duration = ""
 
     ip = session.get('ip', request.remote_addr)
     browser = session.get('browser', request.user_agent.string)
@@ -80,7 +83,7 @@ def send_to_google_script(email, status, logout=False):
     except Exception as e:
         print("❌ Failed to log to Google Sheet:", e)
 
-# 📤 Send OTP
+# ✉️ Send OTP
 def send_otp(email):
     otp = str(random.randint(100000, 999999))
     session['otp'] = otp
@@ -108,7 +111,7 @@ def send_otp(email):
 
     mail.send(msg)
 
-# 📥 Login
+# 📨 Login
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
@@ -122,7 +125,7 @@ def login():
 
     return render_template('login.html')
 
-# ✅ OTP Verify
+# 🔐 OTP Verify
 @app.route('/verify', methods=['GET', 'POST'])
 def verify():
     if session.get('logged_in'):
@@ -155,21 +158,24 @@ def verify():
 
     return render_template('verify.html')
 
-# 🖥️ Dashboard
+# 📋 Dashboard
 @app.route('/dashboard')
 def dashboard():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     return render_template('dashboard.html', email=session['email'], last_login=session.get('login_time'))
 
-# 🚪 Logout
+# 🚪 Logout (Safe)
 @app.route('/logout')
 def logout():
     email = session.get('email', 'Unknown')
-    send_to_google_script(email, "Logout", logout=True)
+    try:
+        send_to_google_script(email, "Logout", logout=True)
+    except:
+        send_to_google_script(email, "Logout", logout=False)
     session.clear()
     return redirect(url_for('login'))
 
-# 🚀 Start
+# 🚀 Run
 if __name__ == '__main__':
     app.run(debug=True)

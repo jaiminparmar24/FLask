@@ -7,9 +7,13 @@ import time
 import sqlite3
 import requests
 from datetime import datetime
+from pytz import timezone
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
+
+# ⏱️ India timezone
+india = timezone('Asia/Kolkata')
 
 # 🔐 Gmail Email Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -48,21 +52,20 @@ def get_last_login(email):
 
 # 🔄 Update last login
 def update_last_login(email):
-    now = datetime.now().isoformat()
+    now = datetime.now(india).isoformat()
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
 
-# 🌍 Send to Google Sheet
-# 🌍 Send to Google Sheet (Only email, time, and status)
-def send_to_google_script(email, status, logout=False):
-    url = "https://script.google.com/macros/s/AKfycbwAD7PDD28MAsqRYiQIJZdSW4NqgGa78KLbMZvI1MoS7mLQozQIFPqdwcrtTTP8aYWP/exec"  # Replace with actual deployed script URL
+# 🌍 Send to Google Sheet (email, time, status only)
+def send_to_google_script(email, status):
+    url = "https://script.google.com/macros/s/AKfycbwAD7PDD28MAsqRYiQIJZdSW4NqgGa78KLbMZvI1MoS7mLQozQIFPqdwcrtTTP8aYWP/exec"
     login_time = session.get('login_time')
-    
+
     data = {
         "email": email,
-        "time": (login_time or datetime.now()).strftime("%Y-%m-%d %H:%M:%S"),
+        "time": (login_time or datetime.now(india)).strftime("%Y-%m-%d %H:%M:%S"),
         "status": status
     }
 
@@ -70,7 +73,6 @@ def send_to_google_script(email, status, logout=False):
         requests.post(url, json=data)
     except Exception as e:
         print("❌ Failed to log to Google Sheet:", e)
-
 
 # ✉️ Send OTP
 def send_otp(email):
@@ -147,7 +149,7 @@ def verify():
         if user_otp == session.get('otp'):
             session['verified'] = True
             session['logged_in'] = True
-            session['login_time'] = datetime.now()
+            session['login_time'] = datetime.now(india)
             session['ip'] = request.remote_addr
             session['browser'] = request.user_agent.string
             update_last_login(session['email'])
@@ -171,10 +173,7 @@ def dashboard():
 @app.route('/logout')
 def logout():
     email = session.get('email', 'Unknown')
-    try:
-        send_to_google_script(email, "Logout", logout=True)
-    except:
-        send_to_google_script(email, "Logout", logout=False)
+    send_to_google_script(email, "Logout")
     session.clear()
     return redirect(url_for('login'))
 

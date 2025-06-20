@@ -126,29 +126,28 @@
       .logo { font-size: 1.5rem; }
       #timer { font-size: 0.9rem; }
     }
-    @keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  50% { transform: translateX(5px); }
-  75% { transform: translateX(-5px); }
-  100% { transform: translateX(0); }
-}
 
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
   </style>
 </head>
 <body>
-<div class="card">
-  <div class="logo">OTP Verification</div>
+  <div class="card">
+    <div class="logo">OTP Verification</div>
 
-  {% if error %}
-    <div style="background-color: #ff4d4d; color: white; padding: 15px; border-radius: 8px; text-align: center; font-size: 18px; margin-bottom: 20px; animation: shake 0.3s;">
-      ❌ {{ error }}
-    </div>
-  {% endif %}
+    {% if error %}
+      <div style="background-color: #ff4d4d; color: white; padding: 15px; border-radius: 8px; text-align: center; font-size: 18px; margin-bottom: 20px; animation: shake 0.3s;">
+        ❌ {{ error }}
+      </div>
+    {% endif %}
 
-  <form method="POST">
-
-      <input type="text" name="otp" id="otpInput" placeholder="Enter OTP from email" required>
+    <form method="POST">
+      <input type="text" name="otp" id="otpInput" placeholder="Enter OTP from email" required maxlength="6" pattern="\d{6}" inputmode="numeric">
       <button type="submit" id="verifyBtn">✅ Verify OTP</button>
       <button type="submit" name="resend" id="resendBtn" disabled>🔁 Resend OTP</button>
     </form>
@@ -164,6 +163,12 @@
     const timerEl = document.getElementById("timer");
     const verifyBtn = document.getElementById("verifyBtn");
     const resendBtn = document.getElementById("resendBtn");
+    const otpInput = document.getElementById("otpInput");
+
+    // 🔒 Restrict to 6-digit numbers only
+    otpInput.addEventListener("input", () => {
+      otpInput.value = otpInput.value.replace(/\D/g, "").slice(0, 6);
+    });
 
     function updateTimer() {
       const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
@@ -201,7 +206,7 @@
     }
 
     updateTimer();
-    startResendCooldown();  // Start timer on page load
+    startResendCooldown();
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("status") === "success") {

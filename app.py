@@ -10,7 +10,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# 📧 Mail Configuration
+# 🔐 Gmail Email Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -21,7 +21,7 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
 
 mail = Mail(app)
 
-# 📦 Init SQLite DB
+# 🛢️ Initialize DB
 def init_db():
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
@@ -35,7 +35,17 @@ def init_db():
 
 init_db()
 
-# 🔐 Update last login
+# ⏱️ Get last login
+def get_last_login(email):
+    with sqlite3.connect('users.db') as conn:
+        c = conn.cursor()
+        c.execute("SELECT last_login FROM users WHERE email = ?", (email,))
+        row = c.fetchone()
+        if row and row[0]:
+            return datetime.fromisoformat(row[0])
+        return None
+
+# 🔄 Update last login
 def update_last_login(email):
     now = datetime.now().isoformat()
     with sqlite3.connect('users.db') as conn:
@@ -43,9 +53,9 @@ def update_last_login(email):
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
 
-# 🌍 Send login/logout to Google Sheet
+# 🌍 Send to Google Sheet
 def send_to_google_script(email, status, logout=False):
-    url = "https://script.google.com/macros/s/AKfycbwAD7PDD28MAsqRYiQIJZdSW4NqgGa78KLbMZvI1MoS7mLQozQIFPqdwcrtTTP8aYWP/exec"  # Replace this
+    url = "https://script.google.com/macros/s/AKfycbwAD7PDD28MAsqRYiQIJZdSW4NqgGa78KLbMZvI1MoS7mLQozQIFPqdwcrtTTP8aYWP/exec"  # Replace with actual deployed script URL
     login_time = session.get('login_time')
     logout_time = datetime.now() if logout else None
     duration = ""
@@ -94,24 +104,31 @@ def send_otp(email):
     msg = Message(
         subject="🔐 Your OTP for JAIMIN's Login",
         recipients=[email],
-        reply_to="noreply@example.com"
+        reply_to="noreply@example.com",
+        extra_headers={"X-Priority": "1", "X-MSMail-Priority": "High"}
     )
 
     msg.body = f"Your OTP is: {otp}"
     msg.html = f"""
     <html>
-      <body style="font-family: Arial, sans-serif;">
-        <h2>🔐 Login Verification by JAIMIN</h2>
-        <p>Your OTP is:</p>
-        <h1>{otp}</h1>
-        <p>Expires in 5 minutes.</p>
+      <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+        <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px;">
+          <h2 style="color: #4CAF50;">🔐 Login Verification By JAIMIN</h2>
+          <p>Hi there 👋,</p>
+          <p>You requested a One-Time Password (OTP) to log in.</p>
+          <h1 style="background: #222; color: #fff; padding: 10px 20px; border-radius: 8px; display: inline-block;">{otp}</h1>
+          <p>This OTP will expire in <strong>5 minutes</strong> and can only be used once.</p>
+          <p>If you didn’t request this, you can safely ignore this email.</p>
+          <br>
+          <p style="color: #888;">— JAIMIN's Secure Login Team 🚀</p>
+        </div>
       </body>
     </html>
     """
 
     mail.send(msg)
 
-# 📨 Login
+# 📨 Login route
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
@@ -120,12 +137,17 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         session['email'] = email
-        send_otp(email)
-        return redirect(url_for('verify'))
+
+        if session.get('verified') and session.get('email') == email:
+            session['logged_in'] = True
+            return redirect(url_for('dashboard'))
+        else:
+            send_otp(email)
+            return redirect(url_for('verify'))
 
     return render_template('login.html')
 
-# 🔐 OTP Verify
+# 🔐 OTP Verify route
 @app.route('/verify', methods=['GET', 'POST'])
 def verify():
     if session.get('logged_in'):
@@ -141,7 +163,7 @@ def verify():
 
         if not session.get('otp') or time.time() - otp_time > 300:
             session.pop('otp', None)
-            return render_template('verify.html', error="⏰ OTP expired!")
+            return render_template('verify.html', error="⏰ OTP expired. Please login again.")
 
         if user_otp == session.get('otp'):
             session['verified'] = True
@@ -149,12 +171,11 @@ def verify():
             session['login_time'] = datetime.now()
             session['ip'] = request.remote_addr
             session['browser'] = request.user_agent.string
-
             update_last_login(session['email'])
             send_to_google_script(session['email'], "Login")
-            return redirect(url_for('dashboard'))
-
-        return render_template('verify.html', error="❌ Invalid OTP")
+            return redirect(url_for('dashboard') + "?status=success")
+        else:
+            return render_template('verify.html', error="Invalid OTP. Please try again! 🔐")
 
     return render_template('verify.html')
 
@@ -163,9 +184,11 @@ def verify():
 def dashboard():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-    return render_template('dashboard.html', email=session['email'], last_login=session.get('login_time'))
 
-# 🚪 Logout (Safe)
+    last_login = get_last_login(session['email'])
+    return render_template('dashboard.html', email=session['email'], last_login=last_login)
+
+# 🚪 Logout
 @app.route('/logout')
 def logout():
     email = session.get('email', 'Unknown')
@@ -176,6 +199,6 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# 🚀 Run
+# 🚀 Start server
 if __name__ == '__main__':
     app.run(debug=True)

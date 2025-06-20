@@ -54,44 +54,22 @@ def update_last_login(email):
         conn.commit()
 
 # 🌍 Send to Google Sheet
+# 🌍 Send to Google Sheet (Only email, time, and status)
 def send_to_google_script(email, status, logout=False):
     url = "https://script.google.com/macros/s/AKfycbwAD7PDD28MAsqRYiQIJZdSW4NqgGa78KLbMZvI1MoS7mLQozQIFPqdwcrtTTP8aYWP/exec"  # Replace with actual deployed script URL
     login_time = session.get('login_time')
-    logout_time = datetime.now() if logout else None
-    duration = ""
-
-    if login_time and logout_time:
-        try:
-            duration = str(logout_time - login_time).split('.')[0]
-        except:
-            duration = ""
-
-    ip = session.get('ip', request.remote_addr)
-    browser = session.get('browser', request.user_agent.string)
-    city = country = "Unknown"
-
-    try:
-        geo = requests.get(f"http://ip-api.com/json/{ip}").json()
-        city = geo.get("city", "Unknown")
-        country = geo.get("country", "Unknown")
-    except:
-        pass
-
+    
     data = {
         "email": email,
         "time": (login_time or datetime.now()).strftime("%Y-%m-%d %H:%M:%S"),
-        "status": status,
-        "ip": ip,
-        "browser": browser,
-        "city": city,
-        "country": country,
-        "duration": duration
+        "status": status
     }
 
     try:
         requests.post(url, json=data)
     except Exception as e:
         print("❌ Failed to log to Google Sheet:", e)
+
 
 # ✉️ Send OTP
 def send_otp(email):

@@ -43,6 +43,22 @@
       letter-spacing: 2px;
     }
 
+    .summary {
+      font-size: 0.95rem;
+      color: #e0ffff;
+      margin-bottom: 15px;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,255,255,0.2);
+      animation: slideIn 1.2s ease-in-out;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
     input[type="email"] {
       width: 100%;
       padding: 14px;
@@ -92,8 +108,11 @@
 <body>
   <div class="card">
     <div class="logo">LOGIN</div>
-  <form method="POST" action="/">
-
+    <div class="summary">
+      Welcome to our login page.<br>
+      <strong style="color:#00ffff">Designed by JAIMIN</strong>
+    </div>
+    <form method="POST" action="/">
       <input type="email" id="email" name="email" placeholder="Enter your email" required>
       <button type="submit" id="submitBtn">🔐 Send OTP</button>
     </form>

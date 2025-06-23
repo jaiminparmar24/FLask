@@ -11,18 +11,18 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# 🔐 Gmail Email Configuration
+# Mail config with fallback for env vars (replace with your email & app password or set env vars)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME') or 'your_email@gmail.com'        # <-- Replace here or set env
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD') or 'your_app_password'          # <-- Replace here or set env
+app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
 
 mail = Mail(app)
 
-# 🛢️ Initialize DB
+# Initialize DB
 def init_db():
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
@@ -36,7 +36,6 @@ def init_db():
 
 init_db()
 
-# ⏱️ Get last login
 def get_last_login(email):
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
@@ -46,7 +45,6 @@ def get_last_login(email):
             return datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S')
         return None
 
-# 🔄 Update last login
 def update_last_login(email):
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     with sqlite3.connect('users.db') as conn:
@@ -54,7 +52,6 @@ def update_last_login(email):
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
 
-# 🌍 Send to Google Sheet (email, time, status only)
 def send_to_google_script(email, status):
     url = "https://script.google.com/macros/s/AKfycbwAD7PDD28MAsqRYiQIJZdSW4NqgGa78KLbMZvI1MoS7mLQozQIFPqdwcrtTTP8aYWP/exec"
     login_time = session.get('login_time')
@@ -70,7 +67,6 @@ def send_to_google_script(email, status):
     except Exception as e:
         print("❌ Failed to log to Google Sheet:", e)
 
-# ✉️ Send OTP
 def send_otp(email):
     otp = str(random.randint(100000, 999999))
     session['otp'] = otp
@@ -103,28 +99,36 @@ def send_otp(email):
     </html>
     """
 
-    mail.send(msg)
+    try:
+        mail.send(msg)
+        print(f"✅ OTP sent to {email}: {otp}")  # for debug
+    except Exception as e:
+        print("❌ Failed to send email:", e)
+        raise e
 
-# 📨 Login route
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
         return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
-        email = request.form['email']
-        session['email'] = email
+        try:
+            email = request.form['email'].strip()
+            if not email:
+                return render_template('login.html', error="Please enter an email address.")
+            session['email'] = email
 
-        if session.get('verified') and session.get('email') == email:
-            session['logged_in'] = True
-            return redirect(url_for('dashboard'))
-        else:
-            send_otp(email)
-            return redirect(url_for('verify'))
+            if session.get('verified') and session.get('email') == email:
+                session['logged_in'] = True
+                return redirect(url_for('dashboard'))
+            else:
+                send_otp(email)
+                return redirect(url_for('verify'))
+        except Exception as e:
+            return render_template('login.html', error=f"Error: {str(e)}")
 
     return render_template('login.html')
 
-# 🔐 OTP Verify route
 @app.route('/verify', methods=['GET', 'POST'])
 def verify():
     if session.get('logged_in'):
@@ -135,10 +139,10 @@ def verify():
             send_otp(session.get('email'))
             return redirect(url_for('verify'))
 
-        user_otp = request.form['otp']
+        user_otp = request.form.get('otp', '').strip()
         otp_time = session.get('otp_time')
 
-        if not session.get('otp') or time.time() - otp_time > 300:
+        if not session.get('otp') or (time.time() - otp_time > 300):
             session.pop('otp', None)
             return render_template('verify.html', error="⏰ OTP expired. Please login again.")
 
@@ -156,7 +160,6 @@ def verify():
 
     return render_template('verify.html')
 
-# 📋 Dashboard
 @app.route('/dashboard')
 def dashboard():
     if not session.get('logged_in'):
@@ -165,7 +168,6 @@ def dashboard():
     last_login = get_last_login(session['email'])
     return render_template('dashboard.html', email=session['email'], last_login=last_login)
 
-# 🚪 Logout
 @app.route('/logout')
 def logout():
     email = session.get('email', 'Unknown')
@@ -173,6 +175,5 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# 🚀 Start server
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,19 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Site Under Maintenance</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>We'll Be Back Soon</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      background-color: #101010;
-      color: #00ffff;
-      font-family: Arial, sans-serif;
+      background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
+      font-family: 'Poppins', sans-serif;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
       text-align: center;
-      padding: 100px;
+      padding: 40px 20px;
+      animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container {
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #00ffff;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #e0ffff;
+    }
+
+    .email {
+      margin-top: 30px;
+      font-size: 0.95rem;
+      color: #ccc;
+    }
+
+    .email a {
+      color: #00ffff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+      p {
+        font-size: 0.95rem;
+      }
+      .email {
+        font-size: 0.85rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>🚧 Site Under Maintenance</h1>
-  <p>We are performing scheduled updates.<br>Please check back later.</p>
+  <div class="container">
+    <h1>🚧 Site Under Maintenance</h1>
+    <p>We’re currently making improvements to serve you better.<br>Thanks for your patience. We'll be back shortly!</p>
+    <div class="email">
+      📧 Contact us at: <a href="mailto:jaiminparmar024@gmail.com">jaiminparmar024@gmail.com</a>
+    </div>
+  </div>
 </body>
 </html>

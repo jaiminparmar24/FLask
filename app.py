@@ -11,18 +11,24 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# Mail config with fallback for env vars (replace with your email & app password or set env vars)
+# Maintenance mode check
+@app.before_request
+def check_maintenance():
+    if os.environ.get('MAINTENANCE_MODE') == 'on':
+        return render_template('maintenance.html'), 503
+
+# Mail config
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME') or 'your_email@gmail.com'        # <-- Replace here or set env
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD') or 'your_app_password'          # <-- Replace here or set env
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME') or 'your_email@gmail.com'
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD') or 'your_app_password'
 app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
 
 mail = Mail(app)
 
-# Initialize DB
+# DB init
 def init_db():
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
@@ -101,7 +107,7 @@ def send_otp(email):
 
     try:
         mail.send(msg)
-        print(f"✅ OTP sent to {email}: {otp}")  # for debug
+        print(f"✅ OTP sent to {email}: {otp}")
     except Exception as e:
         print("❌ Failed to send email:", e)
         raise e

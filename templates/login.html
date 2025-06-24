@@ -3,21 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <title>Welcome | JAIMIN LOGIN</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: url('https://i.postimg.cc/9f89s6qq/login.jpg') no-repeat center center fixed;
-      background-size: cover;
+      background: linear-gradient(to right, #141e30, #243b55);
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      animation: fadeIn 0.6s ease-in;
+      animation: fadeIn 1.5s ease-in;
     }
 
     @keyframes fadeIn {
@@ -26,103 +24,84 @@
     }
 
     .card {
-      background: rgba(0, 0, 0, 0.25);
-      padding: 25px;
-      border-radius: 16px;
-      box-shadow: 0 0 15px rgba(0, 255, 255, 0.25);
-      backdrop-filter: blur(6px);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+      backdrop-filter: blur(15px);
       width: 90%;
-      max-width: 350px;
+      max-width: 380px;
       text-align: center;
       color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .logo {
-      font-size: 1.7rem;
+      font-size: 2rem;
       font-weight: bold;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       color: #00ffff;
-      text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
-      animation: logoGlow 1.5s infinite alternate;
-    }
-
-    @keyframes logoGlow {
-      from { text-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
-      to { text-shadow: 0 0 15px rgba(0, 255, 255, 0.8); }
+      letter-spacing: 2px;
     }
 
     .summary {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: #e0ffff;
       margin-bottom: 15px;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.08);
       padding: 10px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,255,255,0.2);
+      animation: slideIn 1.2s ease-in-out;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     input[type="email"] {
       width: 100%;
-      padding: 12px;
-      margin: 12px 0;
+      padding: 14px;
+      margin: 15px 0;
       border: none;
-      border-radius: 8px;
-      background-color: rgba(255, 255, 255, 0.85);
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.9);
       color: #000;
-      font-size: 0.95rem;
+      font-size: 1rem;
       outline: none;
-    }
-
-    input[type="email"]:focus {
-      box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
-      background-color: rgba(255, 255, 255, 0.95);
     }
 
     button {
       width: 100%;
-      padding: 12px;
-      font-size: 0.95rem;
+      padding: 14px;
+      font-size: 1rem;
       border: none;
-      border-radius: 8px;
-      background: rgba(0, 255, 255, 0.85);
+      border-radius: 10px;
+      background: #00ffff;
       color: #000;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-    }
-
-    button:hover:enabled {
-      background: rgba(0, 204, 204, 0.9);
+      transition: background 0.3s ease;
     }
 
     button:disabled {
-      background: rgba(180, 180, 180, 0.6);
+      background: #aaa;
       cursor: not-allowed;
     }
 
-    .footer {
-      margin-top: 15px;
-      font-size: 0.8rem;
-      color: #fff;
-      text-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+    button:hover:enabled {
+      background: #00cccc;
     }
 
-    @media (max-width: 400px) {
-      .card {
-        padding: 20px;
-        border-radius: 14px;
-      }
+    .footer {
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: #ccc;
+    }
 
-      .logo {
-        font-size: 1.5rem;
-      }
-
-      input[type="email"],
-      button {
-        font-size: 0.9rem;
-        padding: 10px;
-      }
+    @media (max-width: 480px) {
+      .card { padding: 25px; }
+      .logo { font-size: 1.5rem; }
     }
   </style>
 </head>
@@ -131,11 +110,11 @@
     <div class="logo">LOGIN</div>
     <div class="summary">
       Welcome to our login page.<br>
-      <strong style="color:#00ffff;">Designed by JAIMIN</strong>
+      <strong style="color:#00ffff">Designed by JAIMIN</strong>
     </div>
     <form method="POST" action="/">
       <input type="email" id="email" name="email" placeholder="Enter your email" required>
-      <button type="submit">🔐 Send OTP</button>
+      <button type="submit" id="submitBtn">🔐 Send OTP</button>
     </form>
     <div class="footer">Safe • Secure • Fast Login</div>
   </div>

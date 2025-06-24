@@ -74,7 +74,7 @@ def send_to_google_script(email, status):
         print("❌ Failed to log to Google Sheet:", e)
 
 def send_otp(email):
-    otp = str(random.randint(100000, 999999))
+    otp = str(random.randint(1000, 9999))
     session['otp'] = otp
     session['otp_time'] = time.time()
     session['email'] = email

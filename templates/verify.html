@@ -1,124 +1,322 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Verify OTP | JAIMIN LOGIN</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: url('https://i.postimg.cc/9f89s6qq/login.jpg') no-repeat center center fixed;
-      background-size: cover;
+      background: linear-gradient(to right, #141e30, #243b55);
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      animation: fadeIn 0.6s ease-in;
+      animation: fadeIn 1.5s ease-in;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
     }
 
     .card {
-      background: rgba(0, 0, 0, 0.2);
-      padding: 25px;
-      border-radius: 16px;
-      box-shadow: 0 0 15px rgba(0, 255, 255, 0.25);
-      backdrop-filter: blur(6px);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+      backdrop-filter: blur(15px);
       width: 90%;
-      max-width: 350px;
+      max-width: 400px;
       text-align: center;
       color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      animation: slideUp 1s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
     .logo {
-      font-size: 1.7rem;
+      font-size: 2rem;
       font-weight: bold;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       color: #00ffff;
-      text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
-      animation: logoGlow 1.5s infinite alternate;
+      letter-spacing: 2px;
     }
 
-    @keyframes logoGlow {
-      from { text-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
-      to { text-shadow: 0 0 15px rgba(0, 255, 255, 0.8); }
-    }
-
+    /* New OTP container for separate boxes */
     .otp-container {
       display: flex;
-      justify-content: space-evenly;
-      margin: 20px 0 25px;
+      justify-content: space-between;
+      margin: 20px 0 30px 0;
     }
 
     .otp-container input {
       width: 45px;
-      height: 50px;
-      font-size: 1.7rem;
+      height: 55px;
+      font-size: 2rem;
       font-weight: bold;
       text-align: center;
-      border-radius: 8px;
+      border-radius: 10px;
       border: 2px solid #00ffff;
       background-color: rgba(255, 255, 255, 0.9);
       color: #000;
       outline: none;
+      transition: border-color 0.3s;
+      user-select: none;
+    }
+
+    .otp-container input:focus {
+      border-color: #00cccc;
+      box-shadow: 0 0 10px #00ffff;
     }
 
     button {
       width: 100%;
-      padding: 12px;
-      font-size: 0.95rem;
+      padding: 14px;
+      font-size: 1rem;
       border: none;
-      border-radius: 8px;
-      background: rgba(0, 255, 255, 0.85);
+      border-radius: 10px;
+      background: #00ffff;
       color: #000;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-      margin-top: 10px;
+      transition: background 0.3s ease;
     }
 
-    button:disabled {
-      background: rgba(170, 170, 170, 0.6);
+    button:hover {
+      background: #00cccc;
+    }
+
+    #resendBtn {
+      margin-top: 10px;
+      background: #ff9800;
+    }
+
+    #resendBtn:disabled {
+      background: #999;
       cursor: not-allowed;
     }
 
     #timer {
-      margin-top: 12px;
+      margin-top: 15px;
       font-weight: bold;
       color: #ffeb3b;
-      font-size: 0.9rem;
+      font-size: 1rem;
+    }
+
+    .success {
+      display: none;
+      color: #00ffab;
+      font-weight: bold;
+      margin-top: 10px;
+      animation: popUp 0.8s ease-in-out forwards;
+    }
+
+    @keyframes popUp {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
 
     .footer {
-      margin-top: 15px;
-      font-size: 0.8rem;
-      color: #fff;
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: #ccc;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 25px;
+      }
+      .logo {
+        font-size: 1.5rem;
+      }
+      #timer {
+        font-size: 0.9rem;
+      }
+      .otp-container input {
+        width: 40px;
+        height: 50px;
+        font-size: 1.7rem;
+      }
+    }
+
+    @keyframes shake {
+      0% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-5px);
+      }
+      50% {
+        transform: translateX(5px);
+      }
+      75% {
+        transform: translateX(-5px);
+      }
+      100% {
+        transform: translateX(0);
+      }
     }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="logo">OTP Verification</div>
-    <form method="POST">
+
+    {% if error %}
+    <div
+      style="
+        background-color: #ff4d4d;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 18px;
+        margin-bottom: 20px;
+        animation: shake 0.3s;
+      "
+    >
+      ❌ {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST" id="otpForm">
       <div class="otp-container">
-        <input type="text" inputmode="numeric" maxlength="1" name="otp1" required autofocus />
-        <input type="text" inputmode="numeric" maxlength="1" name="otp2" required />
-        <input type="text" inputmode="numeric" maxlength="1" name="otp3" required />
-        <input type="text" inputmode="numeric" maxlength="1" name="otp4" required />
+        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp1" required />
+        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp2" required />
+        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp3" required />
+        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp4" required />
+        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp5" required />
+        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp6" required />
       </div>
-      <button type="submit">✅ Verify OTP</button>
-      <button type="button" id="resendBtn" disabled>🔁 Resend OTP</button>
+      <button type="submit" id="verifyBtn">✅ Verify OTP</button>
+      <button type="submit" name="resend" id="resendBtn" disabled>🔁 Resend OTP</button>
     </form>
+
     <div id="timer">OTP expires in: 05:00</div>
+    <div id="successMsg" class="success">🎉 OTP Verified Successfully!</div>
     <div class="footer">Your security is our priority.</div>
   </div>
+
+  <script>
+    const inputs = document.querySelectorAll(".otp-container input");
+    const verifyBtn = document.getElementById("verifyBtn");
+    const resendBtn = document.getElementById("resendBtn");
+    const timerEl = document.getElementById("timer");
+
+    // Automatically move to next input after typing a digit
+    inputs.forEach((input, index) => {
+      input.addEventListener("input", (e) => {
+        const value = e.target.value;
+        e.target.value = value.replace(/[^0-9]/g, ""); // only digits
+        if (value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+
+      // Handle backspace to move focus backward
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && input.value === "" && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+    });
+
+    // Combine OTP digits into one string before submit
+    const form = document.getElementById("otpForm");
+    form.addEventListener("submit", (e) => {
+      // Prevent multiple submit clicks if needed
+      // Optional: check if all inputs filled
+      const otpValue = Array.from(inputs).map(i => i.value).join("");
+      if (otpValue.length < 6) {
+        e.preventDefault();
+        alert("Please enter all 6 digits of the OTP.");
+        return false;
+      }
+      // Add a hidden input with combined OTP to send to server
+      let existing = form.querySelector('input[name="otp"]');
+      if (!existing) {
+        const hiddenOtp = document.createElement("input");
+        hiddenOtp.type = "hidden";
+        hiddenOtp.name = "otp";
+        form.appendChild(hiddenOtp);
+      }
+      form.querySelector('input[name="otp"]').value = otpValue;
+      // Remove individual inputs' name attributes so server receives only combined otp
+      inputs.forEach(i => i.removeAttribute("name"));
+    });
+
+    // Timer and resend button logic (same as your original)
+    let timeLeft = 300;
+    let resendCooldown = 30;
+
+    function updateTimer() {
+      const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
+      const seconds = String(timeLeft % 60).padStart(2, "0");
+      timerEl.textContent = `OTP expires in: ${minutes}:${seconds}`;
+      timeLeft--;
+
+      if (timeLeft < 0) {
+        timerEl.textContent = "⛔ OTP expired. Please request a new one.";
+        verifyBtn.disabled = true;
+        verifyBtn.style.background = "#888";
+        resendBtn.disabled = false;
+        return;
+      }
+
+      setTimeout(updateTimer, 1000);
+    }
+
+    function startResendCooldown() {
+      resendBtn.disabled = true;
+      let cooldown = resendCooldown;
+
+      function countdown() {
+        resendBtn.textContent = `🔁 Resend OTP (${cooldown}s)`;
+        cooldown--;
+        if (cooldown < 0) {
+          resendBtn.textContent = "🔁 Resend OTP";
+          resendBtn.disabled = false;
+        } else {
+          setTimeout(countdown, 1000);
+        }
+      }
+
+      countdown();
+    }
+
+    updateTimer();
+    startResendCooldown();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("status") === "success") {
+      document.getElementById("successMsg").style.display = "block";
+    }
+  </script>
 </body>
 </html>

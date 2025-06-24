@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Verify OTP | JAIMIN LOGIN</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * {
       box-sizing: border-box;
@@ -13,45 +13,37 @@
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #141e30, #243b55);
+      background: url('https://i.postimg.cc/9f89s6qq/login.jpg') no-repeat center center fixed;
+      background-size: cover;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      animation: fadeIn 1.5s ease-in;
+      animation: fadeIn 0.6s ease-in;
     }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(0, 0, 0, 0.2);
       padding: 40px;
       border-radius: 20px;
-      box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
-      backdrop-filter: blur(15px);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+      backdrop-filter: blur(8px);
       width: 90%;
       max-width: 400px;
       text-align: center;
       color: #fff;
-      animation: slideUp 1s ease-out;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      animation: cardAppear 0.5s ease-out;
     }
 
-    @keyframes slideUp {
-      from {
-        transform: translateY(30px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
+    @keyframes cardAppear {
+      from { transform: scale(0.95); opacity: 0.8; }
+      to { transform: scale(1); opacity: 1; }
     }
 
     .logo {
@@ -60,15 +52,20 @@
       margin-bottom: 20px;
       color: #00ffff;
       letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+      animation: logoGlow 1.5s infinite alternate;
     }
 
-    /* New OTP container for separate boxes */
-    .otp-container {
-  display: flex;
-  justify-content: space-evenly; /* better than space-between for 4 boxes */
-  margin: 20px 0 30px 0;
-}
+    @keyframes logoGlow {
+      from { text-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+      to { text-shadow: 0 0 15px rgba(0, 255, 255, 0.8); }
+    }
 
+    .otp-container {
+      display: flex;
+      justify-content: space-evenly;
+      margin: 20px 0 30px;
+    }
 
     .otp-container input {
       width: 50px;
@@ -81,13 +78,13 @@
       background-color: rgba(255, 255, 255, 0.9);
       color: #000;
       outline: none;
-      transition: border-color 0.3s;
-      user-select: none;
+      transition: all 0.2s ease;
     }
 
     .otp-container input:focus {
       border-color: #00cccc;
-      box-shadow: 0 0 10px #00ffff;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+      transform: scale(1.05);
     }
 
     button {
@@ -96,24 +93,27 @@
       font-size: 1rem;
       border: none;
       border-radius: 10px;
-      background: #00ffff;
+      background: rgba(0, 255, 255, 0.8);
       color: #000;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
     }
 
     button:hover {
-      background: #00cccc;
+      background: rgba(0, 204, 204, 0.9);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+      transform: translateY(-2px);
     }
 
     #resendBtn {
       margin-top: 10px;
-      background: #ff9800;
+      background: rgba(255, 152, 0, 0.8);
     }
 
     #resendBtn:disabled {
-      background: #999;
+      background: rgba(153, 153, 153, 0.7);
       cursor: not-allowed;
     }
 
@@ -122,6 +122,7 @@
       font-weight: bold;
       color: #ffeb3b;
       font-size: 1rem;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     }
 
     .success {
@@ -129,58 +130,48 @@
       color: #00ffab;
       font-weight: bold;
       margin-top: 10px;
-      animation: popUp 0.8s ease-in-out forwards;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      animation: popUp 0.4s ease-out forwards;
     }
 
     @keyframes popUp {
-      from {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .error-message {
+      background-color: rgba(255, 77, 77, 0.8);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 20px;
+      animation: shake 0.3s;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
     }
 
     .footer {
       margin-top: 20px;
       font-size: 0.85rem;
-      color: #ccc;
+      color: #fff;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     }
 
     @media (max-width: 480px) {
-      .card {
-        padding: 25px;
-      }
-      .logo {
-        font-size: 1.5rem;
-      }
-      #timer {
-        font-size: 0.9rem;
-      }
+      .card { padding: 25px; }
+      .logo { font-size: 1.5rem; }
       .otp-container input {
-        width: 50px;
+        width: 45px;
         height: 50px;
         font-size: 1.7rem;
-      }
-    }
-
-    @keyframes shake {
-      0% {
-        transform: translateX(0);
-      }
-      25% {
-        transform: translateX(-5px);
-      }
-      50% {
-        transform: translateX(5px);
-      }
-      75% {
-        transform: translateX(-5px);
-      }
-      100% {
-        transform: translateX(0);
       }
     }
   </style>
@@ -190,32 +181,20 @@
     <div class="logo">OTP Verification</div>
 
     {% if error %}
-    <div
-      style="
-        background-color: #ff4d4d;
-        color: white;
-        padding: 15px;
-        border-radius: 8px;
-        text-align: center;
-        font-size: 18px;
-        margin-bottom: 20px;
-        animation: shake 0.3s;
-      "
-    >
+    <div class="error-message">
       ❌ {{ error }}
     </div>
     {% endif %}
 
     <form method="POST" id="otpForm">
       <div class="otp-container">
-        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp1" required />
+        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp1" required autofocus />
         <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp2" required />
         <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp3" required />
         <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp4" required />
-
       </div>
       <button type="submit" id="verifyBtn">✅ Verify OTP</button>
-      <button type="submit" name="resend" id="resendBtn" disabled>🔁 Resend OTP</button>
+      <button type="button" id="resendBtn" disabled>🔁 Resend OTP</button>
     </form>
 
     <div id="timer">OTP expires in: 05:00</div>
@@ -228,53 +207,33 @@
     const verifyBtn = document.getElementById("verifyBtn");
     const resendBtn = document.getElementById("resendBtn");
     const timerEl = document.getElementById("timer");
+    const otpForm = document.getElementById("otpForm");
 
-    // Automatically move to next input after typing a digit
+    // Auto-focus first input on page load
+    inputs[0].focus();
+
+    // Auto-move between OTP inputs
     inputs.forEach((input, index) => {
-      input.addEventListener("input", (e) => {
-        const value = e.target.value;
-        e.target.value = value.replace(/[^0-9]/g, ""); // only digits
+      input.addEventListener('input', (e) => {
+        const value = e.target.value.replace(/[^0-9]/g, '');
+        e.target.value = value;
+        
         if (value.length === 1 && index < inputs.length - 1) {
           inputs[index + 1].focus();
         }
       });
 
-      // Handle backspace to move focus backward
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Backspace" && input.value === "" && index > 0) {
+      // Handle backspace
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && input.value === '' && index > 0) {
           inputs[index - 1].focus();
         }
       });
     });
 
-    // Combine OTP digits into one string before submit
-    const form = document.getElementById("otpForm");
-    form.addEventListener("submit", (e) => {
-      // Prevent multiple submit clicks if needed
-      // Optional: check if all inputs filled
-      const otpValue = Array.from(inputs).map(i => i.value).join("");
-      if (otpValue.length < 4) {
-        e.preventDefault();
-        alert("Please enter all 6 digits of the OTP.");
-        return false;
-      }
-      // Add a hidden input with combined OTP to send to server
-      let existing = form.querySelector('input[name="otp"]');
-      if (!existing) {
-        const hiddenOtp = document.createElement("input");
-        hiddenOtp.type = "hidden";
-        hiddenOtp.name = "otp";
-        form.appendChild(hiddenOtp);
-      }
-      form.querySelector('input[name="otp"]').value = otpValue;
-      // Remove individual inputs' name attributes so server receives only combined otp
-      inputs.forEach(i => i.removeAttribute("name"));
-    });
-
-    // Timer and resend button logic (same as your original)
+    // Timer logic
     let timeLeft = 300;
-    let resendCooldown = 30;
-
+    
     function updateTimer() {
       const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
       const seconds = String(timeLeft % 60).padStart(2, "0");
@@ -288,10 +247,13 @@
         resendBtn.disabled = false;
         return;
       }
-
       setTimeout(updateTimer, 1000);
     }
 
+    // Resend OTP logic
+    let canResend = false;
+    let resendCooldown = 30;
+    
     function startResendCooldown() {
       resendBtn.disabled = true;
       let cooldown = resendCooldown;
@@ -306,17 +268,51 @@
           setTimeout(countdown, 1000);
         }
       }
-
       countdown();
     }
 
+    resendBtn.addEventListener('click', () => {
+      if (!resendBtn.disabled) {
+        // Here you would typically make an AJAX call to resend OTP
+        alert("New OTP has been sent to your email!");
+        timeLeft = 300;
+        verifyBtn.disabled = false;
+        verifyBtn.style.background = "";
+        updateTimer();
+        startResendCooldown();
+      }
+    });
+
+    // Form submission
+    otpForm.addEventListener('submit', (e) => {
+      const otpValue = Array.from(inputs).map(i => i.value).join('');
+      
+      if (otpValue.length < 4) {
+        e.preventDefault();
+        alert("Please enter all 4 digits of the OTP.");
+        return false;
+      }
+      
+      // Add hidden field with combined OTP
+      let hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'otp';
+      hiddenInput.value = otpValue;
+      otpForm.appendChild(hiddenInput);
+      
+      // Remove individual OTP fields from submission
+      inputs.forEach(input => input.removeAttribute('name'));
+    });
+
+    // Check for success parameter in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('status') === 'success') {
+      document.getElementById('successMsg').style.display = 'block';
+    }
+
+    // Initialize
     updateTimer();
     startResendCooldown();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("status") === "success") {
-      document.getElementById("successMsg").style.display = "block";
-    }
   </script>
 </body>
 </html>

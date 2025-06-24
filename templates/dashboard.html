@@ -1,24 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Dashboard | JAIMIN</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
+    * { 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-      margin: 0;
       font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(to right, #314755, #26a0da);
+      background: url('https://i.postimg.cc/9f89s6qq/login.jpg') no-repeat center center fixed;
+      background-size: cover;
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      animation: fadeIn 1s ease-in;
-      overflow: hidden;
+      min-height: 100vh;
+      padding: 20px;
+      animation: fadeIn 0.6s ease-in;
+      overflow-x: hidden;
     }
 
     @keyframes fadeIn {
@@ -27,25 +32,28 @@
     }
 
     .container {
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(12px);
-      padding: 30px;
+      padding: 25px;
       border-radius: 20px;
+      width: 100%;
       max-width: 400px;
-      width: 90%;
-      box-shadow: 0 0 20px rgba(0,255,255,0.2);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
       text-align: center;
-      animation: slideUp 0.8s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      animation: cardAppear 0.5s ease-out;
     }
 
-    @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    @keyframes cardAppear {
+      from { transform: scale(0.95); opacity: 0.8; }
+      to { transform: scale(1); opacity: 1; }
     }
 
     h2 {
       margin-bottom: 10px;
       color: #00ffff;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+      font-size: 1.8rem;
     }
 
     .greeting {
@@ -53,117 +61,166 @@
       margin-bottom: 10px;
       color: #ffd700;
       font-weight: bold;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     }
 
     .clock {
       font-size: 0.9rem;
       margin-bottom: 20px;
       color: #ffeb3b;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     }
 
     button, .btn {
-      background: rgba(0, 255, 255, 0.1);
+      background: rgba(0, 255, 255, 0.15);
       color: #00ffff;
       padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ffffff;
+      margin: 8px 0;
+      border: 1px solid rgba(0, 255, 255, 0.3);
       width: 100%;
       font-size: 1rem;
       border-radius: 10px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       text-decoration: none;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
       backdrop-filter: blur(4px);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
     }
 
     button:hover, .btn:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(0, 255, 255, 0.25);
       color: #ffffff;
-      transform: scale(1.05);
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    }
+
+    button:active, .btn:active {
+      transform: scale(0.97);
     }
 
     .logout {
-      background: #ff4444;
+      background: rgba(255, 68, 68, 0.8);
       color: white;
+      margin-top: 15px;
     }
 
     .logout:hover {
-      background: #cc0000;
+      background: rgba(204, 0, 0, 0.9);
     }
 
     .section-box {
       display: none;
-      margin-top: 10px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid #00ffff;
+      margin: 15px 0;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 255, 255, 0.3);
       border-radius: 10px;
       padding: 15px;
       text-align: left;
       font-size: 0.9rem;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     input[type="text"], input[type="email"], input[type="tel"] {
       width: 100%;
-      padding: 8px;
-      margin: 5px 0 10px;
+      padding: 10px;
+      margin: 8px 0 15px;
       border: none;
       border-radius: 8px;
       font-size: 1rem;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    #cameraPopup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 15px;
+      z-index: 1000;
+      border: 1px solid #00ffff;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+      width: 90%;
+      max-width: 350px;
+    }
+
+    #video {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 10px;
     }
 
     @media (max-width: 480px) {
       .container {
         padding: 20px;
+        max-width: 95%;
+      }
+
+      h2 {
+        font-size: 1.5rem;
       }
 
       button, .btn {
-        font-size: 0.95rem;
+        padding: 10px;
+        font-size: 0.9rem;
       }
-    }
-      button:active, .btn:active {
-      transform: scale(0.97);
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+
+      #cameraPopup {
+        width: 95%;
+        padding: 15px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2 style="font-size: 2rem;"><i class="fas fa-user-circle"></i> Welcome<br><span style="font-size: 0.9rem;">{{ session['email'] }}</span></h2>
+    <h2><i class="fas fa-user-circle"></i> Welcome<br><span style="font-size: 0.9rem;">user@example.com</span></h2>
     <div class="greeting" id="greetingText"></div>
     <div class="clock" id="clock"></div>
-    <button onclick="toggleSection('profileBox')"><i class="fas fa-user"></i> Profile</button>
+    
+   <button onclick="window.location.href='https://jaiminparmar24.github.io/Password/'"><i class="fas fa-user"></i> Profile</button>
+
     <button onclick="openCamera()"><i class="fas fa-camera"></i> Camera</button>
     <button onclick="getLocation()"><i class="fas fa-map-marker-alt"></i> Show My Location</button>
     <button onclick="toggleSection('helpBox')"><i class="fas fa-question-circle"></i> Help & Support</button>
     <button onclick="toggleDarkMode()"><i class="fas fa-moon"></i> Toggle Dark Mode</button>
-    <a href="{{ url_for('logout') }}" class="btn logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    <a href="/logout" class="btn logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    
     <div class="section-box" id="profileBox">
       <label>Email:</label>
-      <input type="email" value="{{ session['email'] }}" readonly>
+      <input type="email" value="user@example.com" readonly>
       <label>Name:</label>
       <input type="text" placeholder="Enter your name">
       <label>Phone:</label>
       <input type="tel" placeholder="Enter phone number">
       <button onclick="alert('✅ Profile Saved!')">Save</button>
     </div>
+    
     <div class="section-box" id="helpBox">
       <p>Need help? Contact: <a href="mailto:jaiminparmar024@gmail.com" style="color:#00ffff;">jaiminparmar024@gmail.com</a></p>
     </div>
   </div>
-  <div id="cameraPopup" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:#000; padding:20px; border-radius:15px; z-index:999; box-shadow:0 0 20px #00ffff;">
-    <video id="video" autoplay width="300" style="border-radius:10px;"></video><br>
-    <button onclick="capturePhoto()" style="margin-top:10px;"><i class='fas fa-camera-retro'></i> Capture Photo</button>
-    <a id="downloadLink" style="display:none; margin-top:10px;" download="capture.png" class="btn"><i class='fas fa-download'></i> Download</a>
-    <button onclick="closeCamera()" style="margin-top:10px;" class="btn"><i class='fas fa-times'></i> Close</button>
+  
+  <div id="cameraPopup">
+    <video id="video" autoplay></video>
+    <button onclick="capturePhoto()"><i class='fas fa-camera-retro'></i> Capture Photo</button>
+    <a id="downloadLink" style="display:none;" download="capture.png" class="btn"><i class='fas fa-download'></i> Download</a>
+    <button onclick="closeCamera()" class="btn"><i class='fas fa-times'></i> Close</button>
   </div>
-  </div>
+
   <script>
+    // Update clock every second
     function updateClock() {
       const now = new Date();
       document.getElementById('clock').textContent = now.toLocaleString();
@@ -171,74 +228,102 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    function toggleSection(id) {
-      const el = document.getElementById(id);
-      el.style.display = el.style.display === "block" ? "none" : "block";
-    }
-
-    function getLocation() {
-      navigator.geolocation.getCurrentPosition(
-        pos => window.open(`https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`, "_blank"),
-        () => alert("Location permission denied.")
-      );
-    }
-
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark");
-      document.body.style.background = document.body.classList.contains("dark")
-        ? "#121212" : "linear-gradient(to right, #0f2027, #203a43, #2c5364)";
-    }
-
-    function openCamera() {
-      const video = document.getElementById("video");
-      const box = document.getElementById("cameraPopup");
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-          video.srcObject = stream;
-          box.style.display = "block";
-        })
-        .catch(() => alert("Camera not accessible."));
-    }
-
-    function closeCamera() {
-      const video = document.getElementById("video");
-      const stream = video.srcObject;
-      if (stream) {
-        const tracks = stream.getTracks();
-        tracks.forEach(track => track.stop());
-        video.srcObject = null;
-      }
-      document.getElementById("cameraPopup").style.display = "none";
-    }
-
+    // Update greeting based on time of day
     function displayGreeting() {
       const hour = new Date().getHours();
       let greeting = "";
       if (hour < 12) greeting = "Good Morning";
       else if (hour < 18) greeting = "Good Afternoon";
       else greeting = "Good Evening";
-     
+      document.getElementById('greetingText').textContent = greeting;
+    }
+    displayGreeting();
+
+    // Toggle section visibility
+    function toggleSection(id) {
+      const el = document.getElementById(id);
+      el.style.display = el.style.display === "block" ? "none" : "block";
     }
 
-    window.addEventListener('load', () => {
-      displayGreeting();
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.body.classList.add('dark');
-        document.body.style.background = "#121212";
+    // Get user location
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            window.open(`https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`, "_blank");
+          },
+          () => {
+            alert("Location permission denied or unavailable.");
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by your browser.");
+      }
+    }
+
+    // Toggle dark mode
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+    }
+
+    // Check for saved dark mode preference
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark-mode");
+    }
+
+    // Camera functions
+    function openCamera() {
+      const video = document.getElementById("video");
+      const box = document.getElementById("cameraPopup");
+      
+      // Set video dimensions for mobile
+      video.width = Math.min(window.innerWidth - 40, 400);
+      video.height = video.width * 0.75;
+      
+      navigator.mediaDevices.getUserMedia({ video: true, facingMode: 'environment' })
+        .then(stream => {
+          video.srcObject = stream;
+          box.style.display = "block";
+        })
+        .catch(err => {
+          console.error("Camera error:", err);
+          alert("Could not access the camera. Please check permissions.");
+        });
+    }
+
+    function closeCamera() {
+      const video = document.getElementById("video");
+      const stream = video.srcObject;
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+      }
+      document.getElementById("cameraPopup").style.display = "none";
+      document.getElementById("downloadLink").style.display = "none";
+    }
+
+    function capturePhoto() {
+      const video = document.getElementById("video");
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      const link = document.getElementById("downloadLink");
+      link.href = canvas.toDataURL("image/png");
+      link.style.display = "inline-block";
+    }
+
+    // Handle mobile resize
+    window.addEventListener('resize', function() {
+      const video = document.getElementById("video");
+      if (video.srcObject) {
+        video.width = Math.min(window.innerWidth - 40, 400);
+        video.height = video.width * 0.75;
       }
     });
-  function capturePhoto() {
-  const video = document.getElementById("video");
-  const canvas = document.createElement("canvas");
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  const dataURL = canvas.toDataURL("image/png");
-  const link = document.getElementById("downloadLink");
-  link.href = dataURL;
-  link.style.display = "inline-block";
-}
-</script>
+  </script>
 </body>
 </html>

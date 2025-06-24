@@ -64,13 +64,14 @@
 
     /* New OTP container for separate boxes */
     .otp-container {
-      display: flex;
-      justify-content: space-between;
-      margin: 20px 0 30px 0;
-    }
+  display: flex;
+  justify-content: space-evenly; /* better than space-between for 4 boxes */
+  margin: 20px 0 30px 0;
+}
+
 
     .otp-container input {
-      width: 45px;
+      width: 50px;
       height: 55px;
       font-size: 2rem;
       font-weight: bold;
@@ -159,7 +160,7 @@
         font-size: 0.9rem;
       }
       .otp-container input {
-        width: 40px;
+        width: 50px;
         height: 50px;
         font-size: 1.7rem;
       }
@@ -211,8 +212,7 @@
         <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp2" required />
         <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp3" required />
         <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp4" required />
-        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp5" required />
-        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp6" required />
+
       </div>
       <button type="submit" id="verifyBtn">✅ Verify OTP</button>
       <button type="submit" name="resend" id="resendBtn" disabled>🔁 Resend OTP</button>
@@ -253,7 +253,7 @@
       // Prevent multiple submit clicks if needed
       // Optional: check if all inputs filled
       const otpValue = Array.from(inputs).map(i => i.value).join("");
-      if (otpValue.length < 6) {
+      if (otpValue.length < 4) {
         e.preventDefault();
         alert("Please enter all 6 digits of the OTP.");
         return false;

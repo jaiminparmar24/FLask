@@ -73,6 +73,7 @@ def send_to_google_script(email, status):
     except Exception as e:
         print("❌ Failed to log to Google Sheet:", e)
 
+# ✅ UPDATED send_otp FUNCTION
 def send_otp(email):
     otp = str(random.randint(1000, 9999))
     session['otp'] = otp
@@ -88,20 +89,75 @@ def send_otp(email):
     )
 
     msg.body = f"Your OTP is: {otp}"
+
     msg.html = f"""
-    <html>
-      <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-        <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px;">
-          <h2 style="color: #4CAF50;">🔐 Login Verification By JAIMIN</h2>
-          <p>Hi there 👋,</p>
-          <p>You requested a One-Time Password (OTP) to log in.</p>
-          <h1 style="background: #222; color: #fff; padding: 10px 20px; border-radius: 8px; display: inline-block;">{otp}</h1>
-          <p>This OTP will expire in <strong>5 minutes</strong> and can only be used once.</p>
-          <p>If you didn’t request this, you can safely ignore this email.</p>
-          <br>
-          <p style="color: #888;">— JAIMIN's Secure Login Team 🚀</p>
-        </div>
-      </body>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>OTP Verification</title>
+      <style>
+        @keyframes slide-in {{
+          from {{ transform: translateY(-50px); opacity: 0; }}
+          to {{ transform: translateY(0); opacity: 1; }}
+        }}
+        body {{
+          background-color: #f4f4f4;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          padding: 0;
+          margin: 0;
+        }}
+        .container {{
+          background: #ffffff;
+          max-width: 600px;
+          margin: 30px auto;
+          padding: 30px;
+          border-radius: 10px;
+          box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+          animation: slide-in 1s ease;
+        }}
+        .otp-box {{
+          font-size: 28px;
+          font-weight: bold;
+          letter-spacing: 8px;
+          background: #222;
+          color: #fff;
+          padding: 15px;
+          border-radius: 12px;
+          text-align: center;
+          margin: 20px 0;
+          animation: slide-in 1s ease;
+        }}
+        .header {{
+          color: #4CAF50;
+          text-align: center;
+          font-size: 26px;
+          margin-bottom: 10px;
+        }}
+        .footer {{
+          font-size: 13px;
+          color: #888;
+          text-align: center;
+          margin-top: 30px;
+        }}
+        .highlight {{
+          color: #333;
+          font-weight: 500;
+        }}
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">🔐 JAIMIN's Secure Login</div>
+        <p>Hello 👋,</p>
+        <p>We received a login request for your email: <span class="highlight">{email}</span></p>
+        <p>Please use the following One-Time Password (OTP) to proceed:</p>
+        <div class="otp-box">{otp}</div>
+        <p>This OTP is valid for <strong>5 minutes</strong>. Please do not share it with anyone.</p>
+        <p>If you didn’t request this, simply ignore this email.</p>
+        <div class="footer">Sent securely by JAIMIN 🚀 | Protecting your identity</div>
+      </div>
+    </body>
     </html>
     """
 

@@ -103,61 +103,10 @@
       background: rgba(204, 0, 0, 0.9);
     }
 
-    .section-box {
-      display: none;
-      margin: 15px 0;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(0, 255, 255, 0.3);
-      border-radius: 10px;
-      padding: 15px;
-      text-align: left;
-      font-size: 0.9rem;
-      animation: slideDown 0.3s ease-out;
-    }
-
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    input[type="text"], input[type="email"], input[type="tel"] {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0 15px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      background: rgba(255, 255, 255, 0.9);
-    }
-
-    #cameraPopup {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.8);
-      padding: 20px;
-      border-radius: 15px;
-      z-index: 1000;
-      border: 1px solid #00ffff;
-      box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
-      width: 90%;
-      max-width: 350px;
-    }
-
-    #video {
-      width: 100%;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        padding: 20px;
-        max-width: 95%;
-      }
-    }
+    
+ 
+      
+    
   </style>
 </head>
 <body>
@@ -167,33 +116,24 @@
     <div class="clock" id="clock"></div>
 
     <button onclick="window.location.href='https://jaiminparmar24.github.io/Password'"><i class="fas fa-user"></i> Profile</button>
-    <button onclick="openCamera()"><i class="fas fa-camera"></i> Camera</button>
+   
     <button onclick="getLocation()"><i class="fas fa-map-marker-alt"></i> Show My Location</button>
-    <button onclick="toggleSection('helpBox')"><i class="fas fa-question-circle"></i> Help & Support</button>
-    <button onclick="toggleDarkMode()"><i class="fas fa-moon"></i> Toggle Dark Mode</button>
+    
     <a href="/logout" class="btn logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
 
-    <div class="section-box" id="helpBox">
-      <p>Need help? Contact: <a href="mailto:jaiminparmar024@gmail.com" style="color:#00ffff;">jaiminparmar024@gmail.com</a></p>
-    </div>
+    
   </div>
 
-  <!-- Camera Popup -->
-  <div id="cameraPopup">
-    <video id="video" autoplay></video>
-    <button onclick="capturePhoto()"><i class='fas fa-camera-retro'></i> Capture Photo</button>
-    <a id="downloadLink" style="display:none;" download="capture.png" class="btn"><i class='fas fa-download'></i> Download</a>
-    <button onclick="closeCamera()" class="btn"><i class='fas fa-times'></i> Close</button>
-  </div>
+ 
 
   <script>
-    // Clock update
+  
     function updateClock() {
-      const now = new Date();
-      document.getElementById('clock').textContent = now.toLocaleString();
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleString();
+}
+setInterval(updateClock, 1000);
+updateClock();
 
     // Greeting
     function displayGreeting() {
@@ -203,12 +143,7 @@
     }
     displayGreeting();
 
-    // Toggle Sections
-    function toggleSection(id) {
-      const el = document.getElementById(id);
-      el.style.display = el.style.display === "block" ? "none" : "block";
-    }
-
+   
     // Location Access
     function getLocation() {
       if (navigator.geolocation) {
@@ -223,7 +158,3 @@
       }
     }
 
-    // Dark Mode
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark-mode");
-      localStorage.se

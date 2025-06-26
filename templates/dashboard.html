@@ -5,156 +5,219 @@
   <title>Dashboard | JAIMIN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: url('https://i.postimg.cc/9f89s6qq/login.jpg') no-repeat center center fixed;
-      background-size: cover;
-      color: #fff;
+      background: linear-gradient(135deg, #FFDEE9, #B5FFFC);
+      color: #333;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-      animation: fadeIn 0.6s ease-in;
-      overflow-x: hidden;
+      height: 100vh;
+      transition: background 0.3s, color 0.3s;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .dark-mode {
+      background: #121212;
+      color: #f0f0f0;
     }
-
-    .container {
-      background: rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(12px);
-      padding: 25px;
-      border-radius: 20px;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
-      text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      animation: cardAppear 0.5s ease-out;
+    .sidebar {
+      width: 220px; background: #fff; border-right: 1px solid #ddd;
+      padding: 20px; display: flex; flex-direction: column;
+      gap: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.05);
     }
-
-    @keyframes cardAppear {
-      from { transform: scale(0.95); opacity: 0.8; }
-      to { transform: scale(1); opacity: 1; }
+    .nav-link {
+      display: flex; align-items: center; gap: 10px;
+      color: #333; text-decoration: none; font-weight: 500;
+      padding: 10px; border-radius: 8px; transition: 0.2s;
     }
-
-    h2 {
-      margin-bottom: 10px;
-      color: #00ffff;
-      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-      font-size: 1.8rem;
-    }
-
-    .greeting {
-      font-size: 1rem;
-      margin-bottom: 10px;
-      color: #ffd700;
-      font-weight: bold;
-    }
-
-    .clock {
-      font-size: 0.9rem;
+    .nav-link:hover { background: #f0f0f0; }
+    .main { flex: 1; padding: 20px; overflow-y: auto; }
+    .topbar {
+      display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 20px;
-      color: #ffeb3b;
     }
-
-    button, .btn {
-      background: rgba(0, 255, 255, 0.15);
-      color: #00ffff;
-      padding: 12px;
-      margin: 8px 0;
-      border: 1px solid rgba(0, 255, 255, 0.3);
-      width: 100%;
-      font-size: 1rem;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+    .topbar .greeting { font-size: 1.2rem; font-weight: bold; color: #20B2AA; }
+    .right-controls { display: flex; gap: 15px; align-items: center; position: relative; }
+    .topbar input[type="search"], select {
+      padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc;
     }
-
-    button:hover, .btn:hover {
-      background: rgba(0, 255, 255, 0.25);
-      color: #ffffff;
-      transform: translateY(-2px);
-      box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    .bell-container {
+      position: relative; cursor: pointer;
     }
-
+    .notification-badge {
+      position: absolute; top: -8px; right: -6px;
+      background: red; color: white; border-radius: 50%; font-size: 10px;
+      width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
+    }
+    .dropdown {
+      position: absolute; top: 30px; right: 0;
+      background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 10px; display: none; width: 200px;
+      border-radius: 8px; z-index: 99;
+    }
+    .bell-container:hover .dropdown { display: block; }
+    .dropdown p { font-size: 0.9rem; margin: 5px 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+    .cards {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;
+    }
+    .card {
+      background: linear-gradient(45deg, #FFC371, #FF5F6D);
+      padding: 20px; border-radius: 15px; color: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center;
+    }
+    .chart-container {
+      margin-top: 30px; background: white; border-radius: 12px; padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
     .logout {
-      background: rgba(255, 68, 68, 0.85);
-      color: white;
+      margin-top: auto; background: #ee0979; color: white;
+      text-align: center; padding: 10px; border-radius: 10px;
+      text-decoration: none; font-weight: bold;
     }
-
-    .logout:hover {
-      background: rgba(204, 0, 0, 0.9);
+    .logout:hover { background: #ff6a00; }
+    .chatbot {
+      position: fixed; bottom: 20px; right: 20px;
+      background: #333; color: white; padding: 15px; border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
-
-    
- 
-      
-    
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar { flex-direction: row; width: 100%; border-right: none; border-bottom: 1px solid #ccc; overflow-x: auto; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2><i class="fas fa-user-circle"></i> Welcome<br><span style="font-size: 0.9rem;">{{ email }}</span></h2>
-    <div class="greeting" id="greetingText"></div>
-    <div class="clock" id="clock"></div>
-
-    <button onclick="window.location.href='https://jaiminparmar24.github.io/Password'"><i class="fas fa-user"></i> Profile</button>
-   
-    <button onclick="getLocation()"><i class="fas fa-map-marker-alt"></i> Show My Location</button>
-    
-    <a href="/logout" class="btn logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-
-    
+  <div class="sidebar">
+    <h3><i class="fas fa-gem"></i> JAIMIN</h3>
+    <a href="#" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="https://jaiminparmar24.github.io/Password" class="nav-link"><i class="fas fa-user"></i> Profile</a>
+    <a href="#" onclick="getLocation()" class="nav-link"><i class="fas fa-map-marker-alt"></i> Location</a>
+    <a href="/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
-
- 
+  <div class="main">
+    <div class="topbar">
+      <div class="greeting">
+        <script>
+          const email = "{{ email }}"; // Passed from Flask backend
+          const hour = new Date().getHours();
+          let greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
+          document.write(`${greeting}, ${email}`);
+        </script>
+      </div>
+      <div class="right-controls">
+        <input type="search" placeholder="Search...">
+        <select onchange="filterChart(this.value)">
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+        </select>
+        <button onclick="toggleDarkMode()">🌙</button>
+        <div class="bell-container">
+          <i class="fas fa-bell"></i>
+          <div class="notification-badge" id="notifCount">3</div>
+          <div class="dropdown">
+            <p>New message from Admin</p>
+            <p>Profile updated</p>
+            <p>System scheduled maintenance</p>
+          </div>
+        </div>
+        <div id="clock"></div>
+      </div>
+    </div>
+    <div class="cards">
+      <div class="card"><i class="fas fa-users"></i><h4>Total Users</h4><p>1,245</p></div>
+      <div class="card"><i class="fas fa-comments"></i><h4>Messages</h4><p>875</p></div>
+      <div class="card"><i class="fas fa-eye"></i><h4>Visits</h4><p>9,632</p></div>
+    </div>
+    <div class="chart-container">
+      <canvas id="barChart" height="100"></canvas>
+      <canvas id="lineChart" height="100" style="margin-top: 40px;"></canvas>
+      <canvas id="pieChart" height="100" style="margin-top: 40px;"></canvas>
+    </div>
+    <div style="margin-top: 40px;">
+      <h3>Recent Activity</h3>
+      <ul>
+        <li>Login from Chrome - 192.168.1.5 - 2 mins ago</li>
+        <li>Profile updated - 10 mins ago</li>
+        <li>System alert viewed - 30 mins ago</li>
+      </ul>
+    </div>
+  </div>
+  <div class="chatbot">Ask me anything!</div>
 
   <script>
-  
     function updateClock() {
-  const now = new Date();
-  document.getElementById('clock').textContent = now.toLocaleString();
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-    // Greeting
-    function displayGreeting() {
-      const hour = new Date().getHours();
-      let greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
-      document.getElementById('greetingText').textContent = greeting;
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleString();
     }
-    displayGreeting();
+    setInterval(updateClock, 1000); updateClock();
 
-   
-    // Location Access
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
     function getLocation() {
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(pos => {
-          const { latitude, longitude } = pos.coords;
-          window.open(`https://maps.google.com/?q=${latitude},${longitude}`, "_blank");
-        }, () => {
-          alert("Location access denied.");
-        });
-      } else {
-        alert("Geolocation not supported.");
-      }
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            const { latitude, longitude } = pos.coords;
+            window.open(`https://maps.google.com/?q=${latitude},${longitude}`, "_blank");
+          }, () => alert("Location access denied."));
+      } else alert("Geolocation not supported.");
     }
 
+    function filterChart(type) {
+      alert("Filtering by: " + type); // Implement filtering logic here
+    }
+
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    new Chart(barCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Daily Visits',
+          data: [120, 190, 300, 500, 200, 300, 400],
+          backgroundColor: '#FF5F6D'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        animation: { duration: 1000, easing: 'easeInOutBounce' }
+      }
+    });
+
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    new Chart(lineCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'User Growth',
+          data: [300, 400, 450, 700, 800, 950],
+          borderColor: '#36A2EB',
+          fill: false
+        }]
+      },
+      options: {
+        animation: { duration: 1000, easing: 'easeInOutBounce' }
+      }
+    });
+
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    new Chart(pieCtx, {
+      type: 'pie',
+      data: {
+        labels: ['Chrome', 'Firefox', 'Safari'],
+        datasets: [{
+          data: [55, 25, 20],
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+        }]
+      },
+      options: {
+        animation: { duration: 1000, easing: 'easeInOutBounce' }
+      }
+    });
+  </script>
+</body>
+</html>

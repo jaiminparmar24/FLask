@@ -1,112 +1,136 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta name="google-site-verification" content="5Q2w2DNziS6aGw83dWomTOjfuIDMzY26NkFmeCWxjFA" />
-  <meta charset="UTF-8">
-  <title>Welcome | JAIMIN LOGIN</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #141e30, #243b55);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      animation: fadeIn 1.5s ease-in;
-    }
+<!-- ✅ Basic SEO -->
+<title>JAIMIN Login Portal | Secure Email OTP System</title>
+<meta name="description" content="Securely login to JAIMIN's portal using email-based OTP verification. Fast, modern, Flask-based authentication system.">
+<meta name="keywords" content="OTP login, email authentication, secure login, Python Flask login, JAIMIN portal, render app">
+<meta name="author" content="Jaimin Parmar">
+<meta name="robots" content="index, follow">
+<meta name="google-site-verification" content="5Q2w2DNziS6aGw83dWomTOjfuIDMzY26NkFmeCWxjFA" />
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+<!-- ✅ Open Graph for Social Sharing (WhatsApp, LinkedIn, etc.) -->
+<meta property="og:title" content="JAIMIN Login Portal 🔐">
+<meta property="og:description" content="Login securely with email OTP using Jaimin's modern Flask system. No password needed!">
+<meta property="og:image" content="https://yourapp.onrender.com/static/logo.png"> <!-- Optional: change to your image URL -->
+<meta property="og:url" content="https://yourapp.onrender.com/">
+<meta property="og:type" content="website">
 
-    .card {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
-      backdrop-filter: blur(15px);
-      width: 90%;
-      max-width: 380px;
-      text-align: center;
-      color: #fff;
-    }
+<!-- ✅ Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="JAIMIN Login Portal 🔐">
+<meta name="twitter:description" content="Secure email OTP login system built by Jaimin. Try it now!">
+<meta name="twitter:image" content="https://yourapp.onrender.com/static/logo.png">
 
-    .logo {
-      font-size: 2rem;
-      font-weight: bold;
-      margin-bottom: 20px;
-      color: #00ffff;
-      letter-spacing: 2px;
-    }
+<!-- ✅ Mobile Responsive -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    .summary {
-      font-size: 0.95rem;
-      color: #e0ffff;
-      margin-bottom: 15px;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 10px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,255,255,0.2);
-      animation: slideIn 1.2s ease-in-out;
-    }
+<!-- ✅ Favicon (Change the URL if you have one) -->
+<link rel="icon" href="https://yourapp.onrender.com/static/favicon.ico" type="image/x-icon">
 
-    @keyframes slideIn {
-      from { transform: translateY(-20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
+<!-- ✅ Canonical URL (for SEO consistency) -->
+<link rel="canonical" href="https://yourapp.onrender.com/">
 
-    input[type="email"] {
-      width: 100%;
-      padding: 14px;
-      margin: 15px 0;
-      border: none;
-      border-radius: 10px;
-      background-color: rgba(255, 255, 255, 0.9);
-      color: #000;
-      font-size: 1rem;
-      outline: none;
-    }
+<!-- ✅ JAIMIN Login Page UI -->
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #141e30, #243b55);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 1.5s ease-in;
+  }
 
-    button {
-      width: 100%;
-      padding: 14px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 10px;
-      background: #00ffff;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 
-    button:disabled {
-      background: #aaa;
-      cursor: not-allowed;
-    }
+  .card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    width: 90%;
+    max-width: 380px;
+    text-align: center;
+    color: #fff;
+  }
 
-    button:hover:enabled {
-      background: #00cccc;
-    }
+  .logo {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #00ffff;
+    letter-spacing: 2px;
+  }
 
-    .footer {
-      margin-top: 20px;
-      font-size: 0.85rem;
-      color: #ccc;
-    }
+  .summary {
+    font-size: 0.95rem;
+    color: #e0ffff;
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,255,255,0.2);
+    animation: slideIn 1.2s ease-in-out;
+  }
 
-    @media (max-width: 480px) {
-      .card { padding: 25px; }
-      .logo { font-size: 1.5rem; }
-    }
-  </style>
+  @keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  input[type="email"] {
+    width: 100%;
+    padding: 14px;
+    margin: 15px 0;
+    border: none;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #000;
+    font-size: 1rem;
+    outline: none;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    background: #00ffff;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+  }
+
+  button:hover:enabled {
+    background: #00cccc;
+  }
+
+  .footer {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: #ccc;
+  }
+
+  @media (max-width: 480px) {
+    .card { padding: 25px; }
+    .logo { font-size: 1.5rem; }
+  }
+</style>
+
 </head>
-
 <body>
   <div class="card">
     <div class="logo">LOGIN</div>

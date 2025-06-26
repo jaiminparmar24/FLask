@@ -59,7 +59,7 @@ def update_last_login(email):
         conn.commit()
 
 def send_to_google_script(email, status):
-    url = "https://script.google.com/macros/s/AKfycbzeY3y3uEZjgLFndHwXK6Tk4bB-7USn45LHaLeCBHGfuFxRcczoqWafVczZVwAoVozrxA/exec"
+    url = "https://script.google.com/macros/s/AKfycbye0Ky4KMKw1O3oQj3ctxqpDPyIZu8PyEn8mt7pQOUiLkqvSZ4OUi-oshm2XEUs8PdMjw/exec"
     login_time = session.get('login_time')
 
     data = {

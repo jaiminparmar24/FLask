@@ -4,16 +4,15 @@
   <meta charset="UTF-8">
   <title>JAIMIN PARMAR Dashboard | Login Page </title>
 
- 
-
   <!-- ✅ SEO Meta Tags -->
   <meta name="description" content="Welcome to JAIMIN PARMAR's Dashboard: Secure, modern, and interactive analytics with charts, notifications, location tracking, and dark mode. Built using Flask and Chart.js.">
   <meta name="keywords" content="dashboard, JAIMIN, Flask dashboard, user analytics, real-time charts, interactive dashboard, dark mode UI, chart.js, Python dashboard, modern UI">
   <meta name="author" content="Jaimin Parmar">
   <meta name="robots" content="index, follow">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="5Q2w2DNziS6aGw83dWomTOjfuIDMzY26NkFmeCWxjFA" />
 
-  <!-- ✅ Social Media Sharing (Open Graph for Facebook & others) -->
+  <!-- ✅ Open Graph -->
   <meta property="og:title" content="JAIMIN | Interactive Dashboard">
   <meta property="og:description" content="Monitor your web app in real-time with JAIMIN’s modern dashboard, featuring dynamic charts, user activity, and a beautiful UI.">
   <meta property="og:image" content="https://jaiminparmar24.github.io/assets/dashboard-preview.jpg">
@@ -26,21 +25,34 @@
   <meta name="twitter:description" content="Track users, activity, and growth using this powerful, stylish dashboard with dark mode and location tracking.">
   <meta name="twitter:image" content="https://jaiminparmar24.github.io/assets/dashboard-preview.jpg">
 
-  <!-- ✅ Favicon (optional) -->
+  <!-- ✅ Favicon -->
   <link rel="icon" href="https://jaiminparmar24.github.io/favicon.ico" type="image/x-icon">
+  <link rel="canonical" href="https://jaiminparmar24.github.io/dashboard">
+
+  <!-- ✅ JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "JAIMIN PARMAR Dashboard",
+    "url": "https://jaiminparmar24.github.io/dashboard",
+    "applicationCategory": "Developer Tools",
+    "operatingSystem": "All",
+    "author": {
+      "@type": "Person",
+      "name": "Jaimin Parmar"
+    },
+    "description": "Interactive dashboard with charts, user tracking, and analytics built using Flask and Chart.js."
+  }
+  </script>
 
   <!-- ✅ External Resources -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      overflow-x: hidden;
-    }
+    html, body { overflow-x: hidden; }
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
       background: linear-gradient(135deg, #FFDEE9, #B5FFFC);
@@ -49,10 +61,7 @@
       height: 100vh;
       transition: background 0.3s, color 0.3s;
     }
-    .dark-mode {
-      background: #121212;
-      color: #f0f0f0;
-    }
+    .dark-mode { background: #121212; color: #f0f0f0; }
     .sidebar {
       width: 220px; background: #fff; border-right: 1px solid #ddd;
       padding: 20px; display: flex; flex-direction: column;
@@ -64,18 +73,21 @@
       padding: 10px; border-radius: 8px; transition: 0.2s;
     }
     .nav-link:hover { background: #f0f0f0; }
-    .main { flex: 1; padding: 20px; overflow-y: auto; }
+    .main {
+      flex: 1; padding: 20px; overflow-y: auto;
+    }
     .topbar {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 20px;
     }
-    .topbar .greeting { font-size: 1.2rem; font-weight: bold; color: #20B2AA; }
+    .topbar .greeting {
+      font-size: 1.2rem; font-weight: bold; color: #20B2AA;
+    }
     .right-controls {
       display: flex; gap: 15px; align-items: center; position: relative;
     }
     .topbar input[type="search"], select {
       padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc;
-      width: 100%;
       max-width: 200px;
     }
     .bell-container {
@@ -93,7 +105,9 @@
       border-radius: 8px; z-index: 99;
     }
     .bell-container:hover .dropdown { display: block; }
-    .dropdown p { font-size: 0.9rem; margin: 5px 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+    .dropdown p {
+      font-size: 0.9rem; margin: 5px 0; border-bottom: 1px solid #eee; padding-bottom: 5px;
+    }
     .cards {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;
     }
@@ -117,33 +131,19 @@
       background: #333; color: white; padding: 15px; border-radius: 10px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
-
-    /* 📱 Mobile responsive styles */
     @media (max-width: 768px) {
       body { flex-direction: column; }
       .sidebar {
         flex-direction: row;
-        width: 100%;
-        padding: 10px;
-        border-right: none;
-        border-bottom: 1px solid #ccc;
-        overflow-x: auto;
-        justify-content: space-around;
+        width: 100%; padding: 10px;
+        border-right: none; border-bottom: 1px solid #ccc;
+        overflow-x: auto; justify-content: space-around;
       }
-      .topbar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-      }
-      .right-controls {
-        flex-wrap: wrap;
-        gap: 10px;
-      }
+      .topbar { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .right-controls { flex-wrap: wrap; gap: 10px; }
       .chatbot {
-        bottom: 80px;
-        right: 10px;
-        width: 90%;
-        max-width: 300px;
+        bottom: 80px; right: 10px;
+        width: 90%; max-width: 300px;
       }
     }
   </style>
@@ -157,10 +157,11 @@
     <a href="/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
   <div class="main">
+    <h1 style="font-size: 1.8rem; margin-bottom: 15px;">JAIMIN PARMAR Interactive Dashboard</h1>
     <div class="topbar">
       <div class="greeting">
         <script>
-          const email = "{{ email }}"; // Flask backend variable
+          const email = "{{ email }}";
           const hour = new Date().getHours();
           let greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
           document.write(`${greeting}, ${email}`);
@@ -201,18 +202,15 @@
     </div>
   </div>
   <div class="chatbot">Ask me anything!</div>
-
   <script>
     function updateClock() {
       const now = new Date();
       document.getElementById('clock').textContent = now.toLocaleString();
     }
     setInterval(updateClock, 1000); updateClock();
-
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
     }
-
     function getLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -222,19 +220,13 @@
           }, () => alert("Location access denied."));
       } else alert("Geolocation not supported.");
     }
-
-    function filterChart(type) {
-      alert("Filtering by: " + type);
-    }
-
+    function filterChart(type) { alert("Filtering by: " + type); }
     function randomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-
     document.getElementById("userCount").textContent = randomInt(1000, 5000);
     document.getElementById("messageCount").textContent = randomInt(500, 3000);
     document.getElementById("visitCount").textContent = randomInt(5000, 15000);
-
     const activities = [
       "User logged in from Firefox",
       "New file uploaded",
@@ -243,24 +235,18 @@
       "New comment received",
       "Security alert resolved"
     ];
-
     const activityList = document.getElementById("activityList");
     for (let i = 0; i < 5; i++) {
       const li = document.createElement("li");
       li.textContent = `${activities[randomInt(0, activities.length - 1)]} - ${randomInt(1, 59)} mins ago`;
       activityList.appendChild(li);
     }
-
     const barCtx = document.getElementById('barChart').getContext('2d');
     new Chart(barCtx, {
       type: 'bar',
       data: {
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'Daily Visits',
-          data: Array.from({ length: 7 }, () => randomInt(100, 1000)),
-          backgroundColor: '#FF5F6D'
-        }]
+        datasets: [{ label: 'Daily Visits', data: Array.from({ length: 7 }, () => randomInt(100, 1000)), backgroundColor: '#FF5F6D' }]
       },
       options: {
         responsive: true,
@@ -268,37 +254,23 @@
         animation: { duration: 1000, easing: 'easeInOutBounce' }
       }
     });
-
     const lineCtx = document.getElementById('lineChart').getContext('2d');
     new Chart(lineCtx, {
       type: 'line',
       data: {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        datasets: [{
-          label: 'User Growth',
-          data: Array.from({ length: 6 }, () => randomInt(200, 1500)),
-          borderColor: '#36A2EB',
-          fill: false
-        }]
+        datasets: [{ label: 'User Growth', data: Array.from({ length: 6 }, () => randomInt(200, 1500)), borderColor: '#36A2EB', fill: false }]
       },
-      options: {
-        animation: { duration: 1000, easing: 'easeInOutBounce' }
-      }
+      options: { animation: { duration: 1000, easing: 'easeInOutBounce' } }
     });
-
     const pieCtx = document.getElementById('pieChart').getContext('2d');
     new Chart(pieCtx, {
       type: 'pie',
       data: {
         labels: ['Chrome', 'Firefox', 'Safari'],
-        datasets: [{
-          data: [randomInt(30, 60), randomInt(10, 40), randomInt(5, 30)],
-          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
-        }]
+        datasets: [{ data: [randomInt(30, 60), randomInt(10, 40), randomInt(5, 30)], backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'] }]
       },
-      options: {
-        animation: { duration: 1000, easing: 'easeInOutBounce' }
-      }
+      options: { animation: { duration: 1000, easing: 'easeInOutBounce' } }
     });
   </script>
 </body>

@@ -243,6 +243,11 @@ def dashboard():
 @app.route('/logout')
 def logout():
     email = session.get('email', 'Unknown')
+    
+    # India time fix
+    india = pytz.timezone("Asia/Kolkata")
+    session['login_time'] = datetime.now(india)  # overwrite to current time for logout
+
     send_to_google_script(email, "Logout")
     session.clear()
     return redirect(url_for('login'))

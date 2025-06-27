@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from flask_mail import Mail, Message
-import random, os, time, sqlite3, requests
+import random, os, time, sqlite3, requests, uuid
 from datetime import datetime
 
 app = Flask(__name__)
@@ -80,20 +80,28 @@ def send_otp(email):
     session['email'] = email
     session['otp_attempts'] = 0
 
+    current_time = datetime.now().strftime("%H:%M:%S")
+    subject = f"🔐 Your OTP for JAIMIN's Login – {current_time}"
+    unique_msg_id = f"<{uuid.uuid4()}@jaiminlogin.com>"
+
     msg = Message(
-        subject="🔐 Your OTP for JAIMIN's Login",
+        subject=subject,
         recipients=[email],
         reply_to="noreply@example.com",
-        extra_headers={"X-Priority": "1", "X-MSMail-Priority": "High"}
+        extra_headers={
+            "X-Priority": "1",
+            "X-MSMail-Priority": "High",
+            "Message-ID": unique_msg_id
+        }
     )
 
     msg.body = f"Your OTP is: {otp}"
 
     msg.html = f"""
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang=\"en\">
     <head>
-      <meta charset="UTF-8">
+      <meta charset=\"UTF-8\">
       <title>OTP Verification</title>
       <style>
         @keyframes slide-in {{
@@ -145,15 +153,15 @@ def send_otp(email):
       </style>
     </head>
     <body>
-      <div class="container">
-        <div class="header">🔐 JAIMIN's Secure Login</div>
+      <div class=\"container\">
+        <div class=\"header\">🔐 JAIMIN's Secure Login</div>
         <p>Hello 👋,</p>
-        <p>We received a login request for your email: <span class="highlight">{email}</span></p>
+        <p>We received a login request for your email: <span class=\"highlight\">{email}</span></p>
         <p>Please use the following One-Time Password (OTP) to proceed:</p>
-        <div class="otp-box">{otp}</div>
+        <div class=\"otp-box\">{otp}</div>
         <p>This OTP is valid for <strong>5 minutes</strong>. Please do not share it with anyone.</p>
         <p>If you didn’t request this, simply ignore this email.</p>
-        <div class="footer">Sent securely by JAIMIN 🚀 | Protecting your identity</div>
+        <div class=\"footer\">Sent securely by JAIMIN 🚀 | Protecting your identity</div>
       </div>
     </body>
     </html>

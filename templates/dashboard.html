@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>JAIMIN PARMAR Dashboard | Login Page</title>
+  <title>JAIMIN PARMAR Dashboard | Login Page </title>
 
   <!-- ✅ SEO Meta Tags -->
   <meta name="description" content="Welcome to JAIMIN PARMAR's Dashboard: Secure, modern, and interactive analytics with charts, notifications, location tracking, and dark mode. Built using Flask and Chart.js.">
@@ -15,7 +15,7 @@
   <!-- ✅ Open Graph -->
   <meta property="og:title" content="JAIMIN | Interactive Dashboard">
   <meta property="og:description" content="Monitor your web app in real-time with JAIMIN’s modern dashboard, featuring dynamic charts, user activity, and a beautiful UI.">
-  <meta property="og:image" content="https://jaiminparmar24.github.io/assets/dashboard-preview.webp">
+  <meta property="og:image" content="https://jaiminparmar24.github.io/assets/dashboard-preview.jpg">
   <meta property="og:url" content="https://jaiminparmar24.github.io/dashboard">
   <meta property="og:type" content="website">
 
@@ -23,18 +23,11 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="JAIMIN | Interactive Dashboard">
   <meta name="twitter:description" content="Track users, activity, and growth using this powerful, stylish dashboard with dark mode and location tracking.">
-  <meta name="twitter:image" content="https://jaiminparmar24.github.io/assets/dashboard-preview.webp">
+  <meta name="twitter:image" content="https://jaiminparmar24.github.io/assets/dashboard-preview.jpg">
 
-  <!-- ✅ Favicon and Canonical -->
+  <!-- ✅ Favicon -->
   <link rel="icon" href="https://jaiminparmar24.github.io/favicon.ico" type="image/x-icon">
   <link rel="canonical" href="https://jaiminparmar24.github.io/dashboard">
-
-  <!-- ✅ Preconnect and External Resources -->
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <!-- ✅ Main Stylesheet -->
-  <link rel="stylesheet" href="/static/styles.min.css">
 
   <!-- ✅ JSON-LD Structured Data -->
   <script type="application/ld+json">
@@ -52,6 +45,108 @@
     "description": "Interactive dashboard with charts, user tracking, and analytics built using Flask and Chart.js."
   }
   </script>
+
+  <!-- ✅ External Resources -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { overflow-x: hidden; }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #FFDEE9, #B5FFFC);
+      color: #333;
+      display: flex;
+      height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    .dark-mode { background: #121212; color: #f0f0f0; }
+    .sidebar {
+      width: 220px; background: #fff; border-right: 1px solid #ddd;
+      padding: 20px; display: flex; flex-direction: column;
+      gap: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+    }
+    .nav-link {
+      display: flex; align-items: center; gap: 10px;
+      color: #333; text-decoration: none; font-weight: 500;
+      padding: 10px; border-radius: 8px; transition: 0.2s;
+    }
+    .nav-link:hover { background: #f0f0f0; }
+    .main {
+      flex: 1; padding: 20px; overflow-y: auto;
+    }
+    .topbar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px;
+    }
+    .topbar .greeting {
+      font-size: 1.2rem; font-weight: bold; color: #20B2AA;
+    }
+    .right-controls {
+      display: flex; gap: 15px; align-items: center; position: relative;
+    }
+    .topbar input[type="search"], select {
+      padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc;
+      max-width: 200px;
+    }
+    .bell-container {
+      position: relative; cursor: pointer;
+    }
+    .notification-badge {
+      position: absolute; top: -8px; right: -6px;
+      background: red; color: white; border-radius: 50%; font-size: 10px;
+      width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
+    }
+    .dropdown {
+      position: absolute; top: 30px; right: 0;
+      background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 10px; display: none; width: 200px;
+      border-radius: 8px; z-index: 99;
+    }
+    .bell-container:hover .dropdown { display: block; }
+    .dropdown p {
+      font-size: 0.9rem; margin: 5px 0; border-bottom: 1px solid #eee; padding-bottom: 5px;
+    }
+    .cards {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;
+    }
+    .card {
+      background: linear-gradient(45deg, #FFC371, #FF5F6D);
+      padding: 20px; border-radius: 15px; color: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center;
+    }
+    .chart-container {
+      margin-top: 30px; background: white; border-radius: 12px; padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .logout {
+      margin-top: auto; background: #ee0979; color: white;
+      text-align: center; padding: 10px; border-radius: 10px;
+      text-decoration: none; font-weight: bold;
+    }
+    .logout:hover { background: #ff6a00; }
+    .chatbot {
+      position: fixed; bottom: 20px; right: 20px;
+      background: #333; color: white; padding: 15px; border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar {
+        flex-direction: row;
+        width: 100%; padding: 10px;
+        border-right: none; border-bottom: 1px solid #ccc;
+        overflow-x: auto; justify-content: space-around;
+      }
+      .topbar { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .right-controls { flex-wrap: wrap; gap: 10px; }
+      .chatbot {
+        bottom: 80px; right: 10px;
+        width: 90%; max-width: 300px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="sidebar">
@@ -61,11 +156,17 @@
     <a href="#" onclick="getLocation()" class="nav-link"><i class="fas fa-map-marker-alt"></i> Location</a>
     <a href="/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
-
   <div class="main">
-    <h1>JAIMIN PARMAR Interactive Dashboard</h1>
+    <h1 style="font-size: 1.8rem; margin-bottom: 15px;">JAIMIN PARMAR Interactive Dashboard</h1>
     <div class="topbar">
-      <div class="greeting"></div>
+      <div class="greeting">
+        <script>
+          const email = "{{ email }}";
+          const hour = new Date().getHours();
+          let greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
+          document.write(`${greeting}, ${email}`);
+        </script>
+      </div>
       <div class="right-controls">
         <input type="search" placeholder="Search...">
         <select onchange="filterChart(this.value)">
@@ -85,108 +186,92 @@
         <div id="clock"></div>
       </div>
     </div>
-
     <div class="cards">
       <div class="card"><i class="fas fa-users"></i><h4>Total Users</h4><p id="userCount"></p></div>
       <div class="card"><i class="fas fa-comments"></i><h4>Messages</h4><p id="messageCount"></p></div>
       <div class="card"><i class="fas fa-eye"></i><h4>Visits</h4><p id="visitCount"></p></div>
     </div>
-
     <div class="chart-container">
-      <canvas id="barChart" height="100" loading="lazy"></canvas>
-      <canvas id="lineChart" height="100" style="margin-top: 40px;" loading="lazy"></canvas>
-      <canvas id="pieChart" height="100" style="margin-top: 40px;" loading="lazy"></canvas>
+      <canvas id="barChart" height="100"></canvas>
+      <canvas id="lineChart" height="100" style="margin-top: 40px;"></canvas>
+      <canvas id="pieChart" height="100" style="margin-top: 40px;"></canvas>
     </div>
-
     <div style="margin-top: 40px;">
       <h3>Recent Activity</h3>
       <ul id="activityList"></ul>
     </div>
   </div>
-
   <div class="chatbot">Ask me anything!</div>
-
-  <!-- ✅ Scripts placed at end for speed -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const email = "{{ email }}";
-      const hour = new Date().getHours();
-      const greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
-      document.querySelector('.greeting').textContent = `${greeting}, ${email}`;
-
-      function updateClock() {
-        document.getElementById('clock').textContent = new Date().toLocaleString();
-      }
-      setInterval(updateClock, 1000); updateClock();
-
-      document.getElementById("userCount").textContent = Math.floor(Math.random() * 4000 + 1000);
-      document.getElementById("messageCount").textContent = Math.floor(Math.random() * 2500 + 500);
-      document.getElementById("visitCount").textContent = Math.floor(Math.random() * 10000 + 5000);
-
-      const activities = ["User logged in from Firefox", "New file uploaded", "Settings updated", "Feedback submitted", "New comment received", "Security alert resolved"];
-      const activityList = document.getElementById("activityList");
-      for (let i = 0; i < 5; i++) {
-        const li = document.createElement("li");
-        li.textContent = `${activities[Math.floor(Math.random() * activities.length)]} - ${Math.floor(Math.random() * 58 + 1)} mins ago`;
-        activityList.appendChild(li);
-      }
-
-      function renderCharts() {
-        const barCtx = document.getElementById('barChart').getContext('2d');
-        new Chart(barCtx, {
-          type: 'bar',
-          data: {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            datasets: [{ label: 'Daily Visits', data: Array.from({ length: 7 }, () => Math.floor(Math.random() * 900 + 100)), backgroundColor: '#FF5F6D' }]
-          },
-          options: { responsive: true, plugins: { legend: { display: false } }, animation: { duration: 1000 } }
-        });
-
-        const lineCtx = document.getElementById('lineChart').getContext('2d');
-        new Chart(lineCtx, {
-          type: 'line',
-          data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            datasets: [{ label: 'User Growth', data: Array.from({ length: 6 }, () => Math.floor(Math.random() * 1300 + 200)), borderColor: '#36A2EB', fill: false }]
-          },
-          options: { animation: { duration: 1000 } }
-        });
-
-        const pieCtx = document.getElementById('pieChart').getContext('2d');
-        new Chart(pieCtx, {
-          type: 'pie',
-          data: {
-            labels: ['Chrome', 'Firefox', 'Safari'],
-            datasets: [{ data: [Math.floor(Math.random() * 30 + 30), Math.floor(Math.random() * 30 + 10), Math.floor(Math.random() * 25 + 5)], backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'] }]
-          },
-          options: { animation: { duration: 1000 } }
-        });
-      }
-
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(renderCharts);
-      } else {
-        setTimeout(renderCharts, 1000);
-      }
-    });
-
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleString();
+    }
+    setInterval(updateClock, 1000); updateClock();
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
     }
-
     function getLocation() {
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(pos => {
-          const { latitude, longitude } = pos.coords;
-          window.open(`https://maps.google.com/?q=${latitude},${longitude}`, "_blank");
-        }, () => alert("Location access denied."));
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            const { latitude, longitude } = pos.coords;
+            window.open(`https://maps.google.com/?q=${latitude},${longitude}`, "_blank");
+          }, () => alert("Location access denied."));
       } else alert("Geolocation not supported.");
     }
-
-    function filterChart(type) {
-      alert("Filtering by: " + type);
+    function filterChart(type) { alert("Filtering by: " + type); }
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
+    document.getElementById("userCount").textContent = randomInt(1000, 5000);
+    document.getElementById("messageCount").textContent = randomInt(500, 3000);
+    document.getElementById("visitCount").textContent = randomInt(5000, 15000);
+    const activities = [
+      "User logged in from Firefox",
+      "New file uploaded",
+      "Settings updated",
+      "Feedback submitted",
+      "New comment received",
+      "Security alert resolved"
+    ];
+    const activityList = document.getElementById("activityList");
+    for (let i = 0; i < 5; i++) {
+      const li = document.createElement("li");
+      li.textContent = `${activities[randomInt(0, activities.length - 1)]} - ${randomInt(1, 59)} mins ago`;
+      activityList.appendChild(li);
+    }
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    new Chart(barCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{ label: 'Daily Visits', data: Array.from({ length: 7 }, () => randomInt(100, 1000)), backgroundColor: '#FF5F6D' }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        animation: { duration: 1000, easing: 'easeInOutBounce' }
+      }
+    });
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    new Chart(lineCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{ label: 'User Growth', data: Array.from({ length: 6 }, () => randomInt(200, 1500)), borderColor: '#36A2EB', fill: false }]
+      },
+      options: { animation: { duration: 1000, easing: 'easeInOutBounce' } }
+    });
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    new Chart(pieCtx, {
+      type: 'pie',
+      data: {
+        labels: ['Chrome', 'Firefox', 'Safari'],
+        datasets: [{ data: [randomInt(30, 60), randomInt(10, 40), randomInt(5, 30)], backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'] }]
+      },
+      options: { animation: { duration: 1000, easing: 'easeInOutBounce' } }
+    });
   </script>
 </body>
 </html>

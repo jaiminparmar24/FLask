@@ -84,22 +84,7 @@
       cursor: not-allowed;
     }
 
-    .footer {
-      margin-top: 15px;
-      font-size: 0.85rem;
-      color: #ccc;
-    }
-
-    footer {
-      background-color: #006666;
-      color: #fff;
-      padding: 12px 8px;
-      text-align: center;
-      font-size: clamp(0.85rem, 2vw, 1rem);
-      width: 100%;
-      margin-top: auto;
-    }
-
+    
     @media (max-width: 480px) {
       .card {
         padding: 24px 20px;

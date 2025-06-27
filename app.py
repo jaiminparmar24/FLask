@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from flask_mail import Mail, Message
 
 import pytz
@@ -12,24 +12,35 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# Maintenance mode check
+# ✅ Robots.txt and Sitemap.xml Routes
+@app.route("/robots.txt")
+def robots():
+    return send_from_directory("static", "robots.txt")
+
+@app.route("/sitemap.xml")
+def sitemap():
+    return send_from_directory("static", "sitemap.xml")
+
+# ✅ Maintenance Mode
 @app.before_request
 def check_maintenance():
-    if os.environ.get('MAINTENANCE_MODE') == 'on':
+    if os.environ.get('MAINTENANCE_MODE') == 'on' and request.endpoint != 'maintenance':
         return render_template('maintenance.html'), 503
 
-# Mail config
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME') or 'your_email@gmail.com'
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD') or 'your_app_password'
-app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
+# ✅ Mail Configuration
+app.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USE_SSL=False,
+    MAIL_USERNAME=os.environ.get('MAIL_USERNAME', 'your_email@gmail.com'),
+    MAIL_PASSWORD=os.environ.get('MAIL_PASSWORD', 'your_app_password'),
+    MAIL_DEFAULT_SENDER=os.environ.get('MAIL_USERNAME', 'your_email@gmail.com')
+)
 
 mail = Mail(app)
 
-# DB init
+# ✅ SQLite DB Setup
 def init_db():
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
@@ -53,46 +64,44 @@ def get_last_login(email):
         return None
 
 def update_last_login(email):
-    india = pytz.timezone("Asia/Kolkata")
-    now = datetime.now(india).strftime('%Y-%m-%d %H:%M:%S')
+    now = datetime.now(pytz.timezone("Asia/Kolkata")).strftime('%Y-%m-%d %H:%M:%S')
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
 
+# ✅ Google Script Logger
 def send_to_google_script(email, status):
-    india = pytz.timezone("Asia/Kolkata")
-    url = "https://script.google.com/macros/s/AKfycbye0Ky4KMKw1O3oQj3ctxqpDPyIZu8PyEn8mt7pQOUiLkqvSZ4OUi-oshm2XEUs8PdMjw/exec"
-    login_time = session.get('login_time')
-
-    data = {
-        "email": email,
-        "time": (login_time or datetime.now(india)).strftime("%Y-%m-%d %H:%M:%S"),
-        "status": status
-    }
-
     try:
+        url = "https://script.google.com/macros/s/AKfycbye0Ky4KMKw1O3oQj3ctxqpDPyIZu8PyEn8mt7pQOUiLkqvSZ4OUi-oshm2XEUs8PdMjw/exec"
+        login_time = session.get('login_time') or datetime.now(pytz.timezone("Asia/Kolkata"))
+        data = {
+            "email": email,
+            "time": login_time.strftime("%Y-%m-%d %H:%M:%S"),
+            "status": status
+        }
         requests.post(url, json=data)
     except Exception as e:
-        print("❌ Failed to log to Google Sheet:", e)
+        print("❌ Google Sheet log failed:", e)
 
-# ✅ UPDATED send_otp FUNCTION
+# ✅ OTP Email Sender
 def send_otp(email):
     session.pop('otp', None)
     session.pop('otp_time', None)
 
-    india = pytz.timezone("Asia/Kolkata")
     otp = str(random.randint(1000, 9999))
-    session['otp'] = otp
-    session['otp_time'] = time.time()
-    session['email'] = email
-    session['otp_attempts'] = 0
+    session.update({
+        'otp': otp,
+        'otp_time': time.time(),
+        'email': email,
+        'otp_attempts': 0
+    })
 
-    current_time = datetime.now(india).strftime("%d %B %Y, %I:%M %p")
-    subject_line = f"🔐 Your OTP for JAIMIN's Login – {current_time}"
+    time_now = datetime.now(pytz.timezone("Asia/Kolkata")).strftime("%d %B %Y, %I:%M %p")
+    subject = f"🔐 Your OTP for JAIMIN's Login – {time_now}"
 
     msg = Message(
-        subject=subject_line,
+        subject=subject,
         recipients=[email],
         reply_to="noreply@example.com",
         extra_headers={"X-Priority": "1", "X-MSMail-Priority": "High"}
@@ -101,102 +110,54 @@ def send_otp(email):
     msg.body = f"Your OTP is: {otp}"
 
     msg.html = f"""<!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <title>OTP Verification</title>
-      <style>
-        @keyframes slide-in {{
-          from {{ transform: translateY(-50px); opacity: 0; }}
-          to {{ transform: translateY(0); opacity: 1; }}
-        }}
-        body {{
-          background-color: #f4f4f4;
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          padding: 0;
-          margin: 0;
-        }}
-        .container {{
-          background: #ffffff;
-          max-width: 600px;
-          margin: 30px auto;
-          padding: 30px;
-          border-radius: 10px;
-          box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-          animation: slide-in 1s ease;
-        }}
-        .otp-box {{
-          font-size: 28px;
-          font-weight: bold;
-          letter-spacing: 8px;
-          background: #222;
-          color: #fff;
-          padding: 15px;
-          border-radius: 12px;
-          text-align: center;
-          margin: 20px 0;
-          animation: slide-in 1s ease;
-        }}
-        .header {{
-          color: #4CAF50;
-          text-align: center;
-          font-size: 26px;
-          margin-bottom: 10px;
-        }}
-        .footer {{
-          font-size: 13px;
-          color: #888;
-          text-align: center;
-          margin-top: 30px;
-        }}
-        .highlight {{
-          color: #333;
-          font-weight: 500;
-        }}
-      </style>
-    </head>
+    <html><head><style>
+    body {{ font-family: 'Segoe UI'; background: #f4f4f4; margin: 0; padding: 0; }}
+    .container {{
+      background: #fff; padding: 30px; max-width: 600px; margin: 30px auto;
+      border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }}
+    .otp-box {{
+      font-size: 26px; letter-spacing: 8px; background: #222; color: #fff;
+      padding: 15px; border-radius: 10px; text-align: center; margin: 20px 0;
+    }}
+    .footer {{ font-size: 13px; color: #888; text-align: center; margin-top: 30px; }}
+    </style></head>
     <body>
-      <div class="container">
-        <div class="header">🔐 JAIMIN's Secure Login</div>
-        <p>Hello 👋,</p>
-        <p>We received a login request for your email: <span class="highlight">{email}</span></p>
-        <p>Please use the following OTP to proceed:</p>
-        <div class="otp-box">{otp}</div>
-        <p>This OTP is valid for <strong>5 minutes</strong>. Please do not share it with anyone.</p>
-        <p>If you didn’t request this, simply ignore this email.</p>
-        <div class="footer">Sent securely by JAIMIN 🚀 | Protecting your identity</div>
-      </div>
-    </body>
-    </html>
-    """
+    <div class="container">
+      <h2 style="color:#20B2AA;">🔐 JAIMIN Login OTP</h2>
+      <p>Hello,</p>
+      <p>We received a login request for: <b>{email}</b></p>
+      <p>Enter this OTP to continue:</p>
+      <div class="otp-box">{otp}</div>
+      <p>This OTP is valid for 5 minutes.</p>
+      <div class="footer">Securely sent by JAIMIN 🚀</div>
+    </div></body></html>"""
 
     try:
         mail.send(msg)
         print(f"✅ OTP sent to {email}: {otp}")
     except Exception as e:
-        print("❌ Failed to send email:", e)
+        print("❌ Email failed:", e)
         raise e
 
+# ✅ Routes
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
         return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
-        try:
-            email = request.form['email'].strip()
-            if not email:
-                return render_template('login.html', error="Please enter an email address.")
-            session['email'] = email
+        email = request.form.get('email', '').strip()
+        if not email:
+            return render_template('login.html', error="Please enter a valid email.")
+        session['email'] = email
 
-            if session.get('verified') and session.get('email') == email:
-                session['logged_in'] = True
-                return redirect(url_for('dashboard'))
-            else:
-                send_otp(email)
-                return redirect(url_for('verify'))
-        except Exception as e:
-            return render_template('login.html', error=f"Error: {str(e)}")
+        if session.get('verified') and session['email'] == email:
+            session['logged_in'] = True
+            return redirect(url_for('dashboard'))
+        else:
+            send_otp(email)
+            return redirect(url_for('verify'))
 
     return render_template('login.html')
 
@@ -218,17 +179,18 @@ def verify():
             return render_template('verify.html', error="⏰ OTP expired. Please login again.")
 
         if user_otp == session.get('otp'):
-            india = pytz.timezone("Asia/Kolkata")
-            session['verified'] = True
-            session['logged_in'] = True
-            session['login_time'] = datetime.now(india)
-            session['ip'] = request.remote_addr
-            session['browser'] = request.user_agent.string
+            session.update({
+                'verified': True,
+                'logged_in': True,
+                'login_time': datetime.now(pytz.timezone("Asia/Kolkata")),
+                'ip': request.remote_addr,
+                'browser': request.user_agent.string
+            })
             update_last_login(session['email'])
             send_to_google_script(session['email'], "Login")
-            return redirect(url_for('dashboard') + "?status=success")
+            return redirect(url_for('dashboard'))
         else:
-            return render_template('verify.html', error="Invalid OTP. Please try again! 🔐")
+            return render_template('verify.html', error="Invalid OTP. Try again!")
 
     return render_template('verify.html')
 
@@ -243,14 +205,14 @@ def dashboard():
 @app.route('/logout')
 def logout():
     email = session.get('email', 'Unknown')
-    
-    # India time fix
-    india = pytz.timezone("Asia/Kolkata")
-    session['login_time'] = datetime.now(india)  # overwrite to current time for logout
-
+    session['login_time'] = datetime.now(pytz.timezone("Asia/Kolkata"))
     send_to_google_script(email, "Logout")
     session.clear()
     return redirect(url_for('login'))
+
+@app.route('/maintenance')
+def maintenance():
+    return render_template("maintenance.html"), 503
 
 if __name__ == '__main__':
     app.run(debug=True)

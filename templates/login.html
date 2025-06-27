@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔐 JAIMIN PARMAR | Secure OTP Login</title>
+
+  <!-- ✅ SEO -->
+  <meta name="description" content="Securely login to JAIMIN PARMAR's portal using email-based OTP verification.">
+  <meta name="keywords" content="OTP login, email authentication, secure login, Flask">
+  <meta name="author" content="Jaimin Parmar">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://yourapp.onrender.com/">
+
+  <!-- ✅ Open Graph -->
+  <meta property="og:title" content="Jaimin Parmar Login Portal 🔐">
+  <meta property="og:description" content="Login securely to the official OTP-based portal by Jaimin Parmar.">
+  <meta property="og:image" content="https://yourapp.onrender.com/static/logo.png">
+  <meta property="og:url" content="https://yourapp.onrender.com/">
+  <meta property="og:type" content="website">
+
+  <!-- ✅ Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JAIMIN PARMAR Login Page 🔐">
+  <meta name="twitter:description" content="Secure email OTP login system built by JAIMIN PARMAR.">
+  <meta name="twitter:image" content="https://yourapp.onrender.com/static/logo.png">
+
+  <!-- ✅ Structured Data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "JAIMIN PARMAR LOGIN",
+      "url": "https://flask-hblv.onrender.com/",
+      "description": "Secure email-based OTP login system built with Flask.",
+      "author": { "@type": "Person", "name": "Jaimin Parmar" }
+    }
+  </script>
+
+  <!-- ✅ Performance -->
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
+  <link rel="prefetch" href="/static/logo.png" as="image">
+
+  <!-- ✅ Embedded CSS -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #0e0e0e;
+      color: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 255, 255, 0.2);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h1 {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+      color: #00ffff;
+    }
+
+    .summary {
+      font-size: 1rem;
+      margin-bottom: 25px;
+      color: #aaa;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    input[type="email"] {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    input[type="email"]:focus {
+      outline: 2px solid #00ffff;
+    }
+
+    button[type="submit"] {
+      padding: 12px;
+      background: #00ffff;
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+      background: #00e0e0;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 20px;
+      }
+
+      .card h1 {
+        font-size: 1.4rem;
+      }
+
+      input[type="email"],
+      button[type="submit"] {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <h1>JAIMIN PARMAR | Login Portal</h1>
+    <div class="summary">
+      Welcome to our login page.<br>
+      <strong style="color:#00ffff;">Designed by JAIMIN</strong>
+    </div>
+    <form method="POST" action="/">
+      <label for="email" hidden>Email</label>
+      <input type="email" id="email" name="email" placeholder="Enter your email" required />
+      <button type="submit">🔐 Send OTP</button>
+    </form>
+    <div class="footer">Safe • Secure • Fast Login</div>
+  </main>
+</body>
+
+</html>

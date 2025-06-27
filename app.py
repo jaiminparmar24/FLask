@@ -160,7 +160,7 @@ def send_otp(email):
         <div class="header">🔐 JAIMIN's Secure Login</div>
         <p>Hello 👋,</p>
         <p>We received a login request for your email: <span class="highlight">{email}</span></p>
-        <p>Please use the following One-Time Password (OTP) to proceed:</p>
+        <p>Please use the following OTP to proceed:</p>
         <div class="otp-box">{otp}</div>
         <p>This OTP is valid for <strong>5 minutes</strong>. Please do not share it with anyone.</p>
         <p>If you didn’t request this, simply ignore this email.</p>

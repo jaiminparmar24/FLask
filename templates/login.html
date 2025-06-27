@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
 
   <!-- ✅ Basic SEO -->
   <title>JAIMIN Login Portal | Secure Email OTP System</title>
@@ -24,16 +24,30 @@
   <meta name="twitter:description" content="Secure email OTP login system built by Jaimin. Try it now!">
   <meta name="twitter:image" content="https://yourapp.onrender.com/static/logo.png">
 
-  <!-- ✅ Mobile Responsive -->
+  <!-- ✅ Responsive -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- ✅ Favicon -->
-  <link rel="icon" href="https://yourapp.onrender.com/static/favicon.ico" type="image/x-icon">
-
-  <!-- ✅ Canonical URL -->
+  <!-- ✅ Canonical & Favicon -->
   <link rel="canonical" href="https://yourapp.onrender.com/">
+  <link rel="icon" href="https://yourapp.onrender.com/static/favicon.ico" type="image/x-icon">
+  <link rel="preload" as="image" href="https://yourapp.onrender.com/static/favicon.ico">
 
-  <!-- ✅ JAIMIN Login Page UI -->
+  <!-- ✅ Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "JAIMIN Login Portal",
+    "url": "https://yourapp.onrender.com/",
+    "description": "Secure email-based OTP login system built with Flask.",
+    "author": {
+      "@type": "Person",
+      "name": "Jaimin Parmar"
+    }
+  }
+  </script>
+
+  <!-- ✅ Login Page UI -->
   <style>
     * { box-sizing: border-box; }
     body {
@@ -129,28 +143,29 @@
       color: #ccc;
     }
 
+    footer {
+      background-color: rgb(0, 255, 221);
+      text-align: center;
+      padding: 12px 0;
+      font-size: 0.9rem;
+      color: #555;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      border-top: 1px solid #ddd;
+      z-index: 999;
+    }
+
+    .dark-mode footer {
+      background-color: #1f1f1f;
+      color: #aaa;
+      border-color: #333;
+    }
+
     @media (max-width: 480px) {
       .card { padding: 25px; }
       .logo { font-size: 1.5rem; }
     }
-    footer {
-  background-color:rgb(0, 255, 221);
-  text-align: center;
-  padding: 12px 0;
-  font-size: 0.9rem;
-  color: #555;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  border-top: 1px solid #ddd;
-  z-index: 999;
-}
-.dark-mode footer {
-  background-color: #1f1f1f;
-  color: #aaa;
-  border-color: #333;
-}
-
   </style>
 </head>
 
@@ -163,13 +178,13 @@
     </div>
     <form method="POST" action="/">
       <input type="email" id="email" name="email" placeholder="Enter your email" required>
-      <button type="submit" id="submitBtn"> Send OTP</button>
+      <button type="submit" id="submitBtn">Send OTP</button>
     </form>
     <div class="footer">Safe • Secure • Fast Login</div>
   </div>
-  <footer>
-  <p>&copy; 2025 JAIMIN PARMAR | Official Secure OTP Login Portal</p>
-</footer>
 
+  <footer>
+    <p>&copy; 2025 JAIMIN PARMAR | Official Secure OTP Login Portal</p>
+  </footer>
 </body>
 </html>

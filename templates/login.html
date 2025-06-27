@@ -2,15 +2,16 @@
 <html lang="en" dir="ltr">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JAIMIN PARMAR | Login Portal</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔐 JAIMIN PARMAR | Secure OTP Login</title>
 
   <!-- ✅ SEO Metadata -->
   <meta name="description" content="Securely login to JAIMIN PARMAR's portal using email-based OTP verification. Fast, modern, Flask-based authentication system.">
   <meta name="keywords" content="OTP login, email authentication, secure login, Python Flask login, JAIMIN portal, render app">
   <meta name="author" content="Jaimin Parmar">
   <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://yourapp.onrender.com/">
 
   <!-- ✅ Open Graph -->
   <meta property="og:title" content="Jaimin Parmar Login Portal 🔐">
@@ -27,21 +28,31 @@
 
   <!-- ✅ Structured Data -->
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "JAIMIN PARMAR LOGIN",
-    "url": "https://flask-hblv.onrender.com/",
-    "description": "Secure email-based OTP login system built with Flask.",
-    "author": { "@type": "Person", "name": "Jaimin Parmar" }
-  }
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "JAIMIN PARMAR LOGIN",
+      "url": "https://flask-hblv.onrender.com/",
+      "description": "Secure email-based OTP login system built with Flask.",
+      "author": { "@type": "Person", "name": "Jaimin Parmar" }
+    }
   </script>
 
-  <!-- ✅ Styles -->
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+  <!-- ✅ Speed Performance Tips -->
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
 
-    html, body {
+  <!-- ✅ Internal CSS (Recommend: move to styles.min.css) -->
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
       height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(to right, #141e30, #243b55);
@@ -58,8 +69,13 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
 
     .card {
@@ -73,8 +89,8 @@
       text-align: center;
     }
 
-    .card h2 {
-      font-size: clamp(1.2rem, 5vw, 1.6rem);
+    .card h1 {
+      font-size: clamp(1.4rem, 5vw, 1.8rem);
       margin-bottom: 16px;
     }
 
@@ -153,21 +169,23 @@
 </head>
 
 <body>
-  <div class="card">
+  <main class="card">
     <h1>JAIMIN PARMAR | Login Portal</h1>
     <div class="summary">
       Welcome to our login page.<br>
       <strong style="color:#00ffff;">Designed by JAIMIN</strong>
     </div>
     <form method="POST" action="/">
-      <input type="email" name="email" placeholder="Enter your email" required>
+      <label for="email" hidden>Email</label>
+      <input type="email" id="email" name="email" placeholder="Enter your email" required />
       <button type="submit">🔐 Send OTP</button>
     </form>
     <div class="footer">Safe • Secure • Fast Login</div>
-  </div>
+  </main>
 
   <footer>
     &copy; 2025 JAIMIN PARMAR | Official Secure OTP Login Portal
   </footer>
 </body>
+
 </html>

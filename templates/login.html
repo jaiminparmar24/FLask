@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html lang="en"dir="ltr">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
-
-  <!-- ✅ Basic SEO -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JAIMIN PARMAR | Login Portal</title>
+
+  <!-- ✅ SEO Metadata -->
   <meta name="description" content="Securely login to JAIMIN PARMAR's portal using email-based OTP verification. Fast, modern, Flask-based authentication system.">
   <meta name="keywords" content="OTP login, email authentication, secure login, Python Flask login, JAIMIN portal, render app">
   <meta name="author" content="Jaimin Parmar">
   <meta name="robots" content="index, follow">
-  <meta name="google-site-verification" content="5Q2w2DNziS6aGw83dWomTOjfuIDMzY26NkFmeCWxjFA" />
 
-  <!-- ✅ Open Graph for Social Sharing -->
- <meta property="og:title" content="Jaimin Parmar Login Portal 🔐">
-<meta property="og:description" content="Login securely to the official OTP-based portal by Jaimin Parmar.">
-<link rel="canonical" href="https://flask-hblv.onrender.com/">
-
+  <!-- ✅ Open Graph -->
+  <meta property="og:title" content="Jaimin Parmar Login Portal 🔐">
+  <meta property="og:description" content="Login securely to the official OTP-based portal by Jaimin Parmar.">
   <meta property="og:image" content="https://yourapp.onrender.com/static/logo.png">
   <meta property="og:url" content="https://yourapp.onrender.com/">
   <meta property="og:type" content="website">
@@ -26,15 +24,7 @@
   <meta name="twitter:description" content="Secure email OTP login system built by JAIMIN PARMAR. Try it now!">
   <meta name="twitter:image" content="https://yourapp.onrender.com/static/logo.png">
 
-  <!-- ✅ Responsive -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- ✅ Canonical & Favicon -->
-  <link rel="canonical" href="https://flask-hblv.onrender.com/">
-  <link rel="icon" href="https://flask-hblv.onrender.com/static/favicon.ico" type="image/x-icon">
-  <link rel="preload" as="image" href="https://flask-hblv.onrender.com/static/favicon.ico">
-
-  <!-- ✅ Schema.org Structured Data -->
+  <!-- ✅ Structured Data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -42,26 +32,28 @@
     "name": "JAIMIN PARMAR LOGIN",
     "url": "https://flask-hblv.onrender.com/",
     "description": "Secure email-based OTP login system built with Flask.",
-    "author": {
-      "@type": "Person",
-      "name": "Jaimin Parmar"
-    }
+    "author": { "@type": "Person", "name": "Jaimin Parmar" }
   }
   </script>
 
-  <!-- ✅ Login Page UI -->
+  <!-- ✅ Styles -->
   <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      padding: 0;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(to right, #141e30, #243b55);
-      height: 100vh;
+      color: #fff;
+    }
+
+    body {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      animation: fadeIn 1.5s ease-in;
+      animation: fadeIn 1s ease-in;
+      padding: 20px;
     }
 
     @keyframes fadeIn {
@@ -70,119 +62,111 @@
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
-      backdrop-filter: blur(15px);
-      width: 90%;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+      padding: 30px 25px;
+      border-radius: 16px;
+      width: 100%;
       max-width: 380px;
       text-align: center;
-      color: #fff;
     }
 
-    .logo {
-      font-size: 2rem;
-      font-weight: bold;
-      margin-bottom: 20px;
-      color: #00ffff;
-      letter-spacing: 2px;
+    .card h2 {
+      font-size: clamp(1.2rem, 5vw, 1.6rem);
+      margin-bottom: 16px;
     }
 
     .summary {
-      font-size: 0.95rem;
+      background: rgba(255, 255, 255, 0.1);
       color: #e0ffff;
-      margin-bottom: 15px;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 10px;
+      padding: 12px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,255,255,0.2);
-      animation: slideIn 1.2s ease-in-out;
-    }
-
-    @keyframes slideIn {
-      from { transform: translateY(-20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      margin-bottom: 20px;
+      font-size: clamp(0.9rem, 4vw, 1rem);
     }
 
     input[type="email"] {
       width: 100%;
       padding: 14px;
       margin: 15px 0;
+      font-size: 1rem;
       border: none;
       border-radius: 10px;
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: rgba(255, 255, 255, 0.95);
       color: #000;
-      font-size: 1rem;
-      outline: none;
+    }
+
+    input::placeholder {
+      color: #666;
     }
 
     button {
       width: 100%;
       padding: 14px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 10px;
       background: #00ffff;
       color: #000;
       font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
       cursor: pointer;
       transition: background 0.3s ease;
     }
 
+    button:hover:enabled {
+      background-color: #00cccc;
+    }
+
     button:disabled {
-      background: #aaa;
+      background-color: #888;
       cursor: not-allowed;
     }
 
-    button:hover:enabled {
-      background: #00cccc;
-    }
-
     .footer {
-      margin-top: 20px;
+      margin-top: 15px;
       font-size: 0.85rem;
       color: #ccc;
     }
 
-   footer {
-  background-color: #00cccc;
-  color: #ffffff;  /* brighter text */
-}
-
-    
-
-    .dark-mode footer {
-      background-color: #1f1f1f;
-      color: #aaa;
-      border-color: #333;
+    footer {
+      background-color: #006666;
+      color: #fff;
+      padding: 12px 8px;
+      text-align: center;
+      font-size: clamp(0.85rem, 2vw, 1rem);
+      width: 100%;
+      margin-top: auto;
     }
 
     @media (max-width: 480px) {
-      .card { padding: 25px; }
-      .logo { font-size: 1.5rem; }
+      .card {
+        padding: 24px 20px;
+      }
+
+      .summary {
+        padding: 10px;
+      }
     }
   </style>
 </head>
 
 <body>
   <div class="card">
-  
-    <h2 style="font-size: 1.4rem; margin-bottom: 12px;">JAIMIN PARMAR | Login Portal</h2>
-<div class="summary">
+    <h2>JAIMIN PARMAR | Login Portal</h2>
+    <div class="summary">
       Welcome to our login page.<br>
-      <strong style="color:#00ffff">Designed by JAIMIN</strong>
+      <strong style="color:#00ffff;">Designed by JAIMIN</strong>
     </div>
     <form method="POST" action="/">
-      <input type="email" id="email" name="email" placeholder="Enter your email" required>
-      <button type="submit" id="submitBtn">🔐 Send OTP</button>
+      <input type="email" name="email" placeholder="Enter your email" required>
+      <button type="submit">🔐 Send OTP</button>
     </form>
     <div class="footer">Safe • Secure • Fast Login</div>
   </div>
 
- <footer style="background-color: #00cccc; color: #fff;">
-  <p style="margin: 0;">&copy; 2025 JAIMIN PARMAR | Official Secure OTP Login Portal</p>
-</footer>
-
+  <footer>
+    &copy; 2025 JAIMIN PARMAR | Official Secure OTP Login Portal
+  </footer>
 </body>
 </html>

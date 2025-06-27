@@ -3,11 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <title>Dashboard | JAIMIN</title>
+
+ 
+
+  <!-- ✅ SEO Meta Tags -->
+  <meta name="description" content="JAIMIN's Dashboard: Secure, modern, and interactive analytics with charts, notifications, location tracking, and dark mode. Built using Flask and Chart.js.">
+  <meta name="keywords" content="dashboard, JAIMIN, Flask dashboard, user analytics, real-time charts, interactive dashboard, dark mode UI, chart.js, Python dashboard, modern UI">
+  <meta name="author" content="Jaimin Parmar">
+  <meta name="robots" content="index, follow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ✅ Social Media Sharing (Open Graph for Facebook & others) -->
+  <meta property="og:title" content="JAIMIN | Interactive Dashboard">
+  <meta property="og:description" content="Monitor your web app in real-time with JAIMIN’s modern dashboard, featuring dynamic charts, user activity, and a beautiful UI.">
+  <meta property="og:image" content="https://jaiminparmar24.github.io/assets/dashboard-preview.jpg">
+  <meta property="og:url" content="https://jaiminparmar24.github.io/dashboard">
+  <meta property="og:type" content="website">
+
+  <!-- ✅ Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JAIMIN | Interactive Dashboard">
+  <meta name="twitter:description" content="Track users, activity, and growth using this powerful, stylish dashboard with dark mode and location tracking.">
+  <meta name="twitter:image" content="https://jaiminparmar24.github.io/assets/dashboard-preview.jpg">
+
+  <!-- ✅ Favicon (optional) -->
+  <link rel="icon" href="https://jaiminparmar24.github.io/favicon.ico" type="image/x-icon">
+
+  <!-- ✅ External Resources -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      overflow-x: hidden;
+    }
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
       background: linear-gradient(135deg, #FFDEE9, #B5FFFC);
@@ -37,9 +70,13 @@
       margin-bottom: 20px;
     }
     .topbar .greeting { font-size: 1.2rem; font-weight: bold; color: #20B2AA; }
-    .right-controls { display: flex; gap: 15px; align-items: center; position: relative; }
+    .right-controls {
+      display: flex; gap: 15px; align-items: center; position: relative;
+    }
     .topbar input[type="search"], select {
       padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc;
+      width: 100%;
+      max-width: 200px;
     }
     .bell-container {
       position: relative; cursor: pointer;
@@ -80,9 +117,34 @@
       background: #333; color: white; padding: 15px; border-radius: 10px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
+
+    /* 📱 Mobile responsive styles */
     @media (max-width: 768px) {
       body { flex-direction: column; }
-      .sidebar { flex-direction: row; width: 100%; border-right: none; border-bottom: 1px solid #ccc; overflow-x: auto; }
+      .sidebar {
+        flex-direction: row;
+        width: 100%;
+        padding: 10px;
+        border-right: none;
+        border-bottom: 1px solid #ccc;
+        overflow-x: auto;
+        justify-content: space-around;
+      }
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .right-controls {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .chatbot {
+        bottom: 80px;
+        right: 10px;
+        width: 90%;
+        max-width: 300px;
+      }
     }
   </style>
 </head>
@@ -98,7 +160,7 @@
     <div class="topbar">
       <div class="greeting">
         <script>
-          const email = "{{ email }}"; // Passed from Flask backend
+          const email = "{{ email }}"; // Flask backend variable
           const hour = new Date().getHours();
           let greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
           document.write(`${greeting}, ${email}`);
@@ -124,9 +186,9 @@
       </div>
     </div>
     <div class="cards">
-      <div class="card"><i class="fas fa-users"></i><h4>Total Users</h4><p>1,245</p></div>
-      <div class="card"><i class="fas fa-comments"></i><h4>Messages</h4><p>875</p></div>
-      <div class="card"><i class="fas fa-eye"></i><h4>Visits</h4><p>9,632</p></div>
+      <div class="card"><i class="fas fa-users"></i><h4>Total Users</h4><p id="userCount"></p></div>
+      <div class="card"><i class="fas fa-comments"></i><h4>Messages</h4><p id="messageCount"></p></div>
+      <div class="card"><i class="fas fa-eye"></i><h4>Visits</h4><p id="visitCount"></p></div>
     </div>
     <div class="chart-container">
       <canvas id="barChart" height="100"></canvas>
@@ -135,11 +197,7 @@
     </div>
     <div style="margin-top: 40px;">
       <h3>Recent Activity</h3>
-      <ul>
-        <li>Login from Chrome - 192.168.1.5 - 2 mins ago</li>
-        <li>Profile updated - 10 mins ago</li>
-        <li>System alert viewed - 30 mins ago</li>
-      </ul>
+      <ul id="activityList"></ul>
     </div>
   </div>
   <div class="chatbot">Ask me anything!</div>
@@ -166,7 +224,31 @@
     }
 
     function filterChart(type) {
-      alert("Filtering by: " + type); // Implement filtering logic here
+      alert("Filtering by: " + type);
+    }
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    document.getElementById("userCount").textContent = randomInt(1000, 5000);
+    document.getElementById("messageCount").textContent = randomInt(500, 3000);
+    document.getElementById("visitCount").textContent = randomInt(5000, 15000);
+
+    const activities = [
+      "User logged in from Firefox",
+      "New file uploaded",
+      "Settings updated",
+      "Feedback submitted",
+      "New comment received",
+      "Security alert resolved"
+    ];
+
+    const activityList = document.getElementById("activityList");
+    for (let i = 0; i < 5; i++) {
+      const li = document.createElement("li");
+      li.textContent = `${activities[randomInt(0, activities.length - 1)]} - ${randomInt(1, 59)} mins ago`;
+      activityList.appendChild(li);
     }
 
     const barCtx = document.getElementById('barChart').getContext('2d');
@@ -176,7 +258,7 @@
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
         datasets: [{
           label: 'Daily Visits',
-          data: [120, 190, 300, 500, 200, 300, 400],
+          data: Array.from({ length: 7 }, () => randomInt(100, 1000)),
           backgroundColor: '#FF5F6D'
         }]
       },
@@ -194,7 +276,7 @@
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
         datasets: [{
           label: 'User Growth',
-          data: [300, 400, 450, 700, 800, 950],
+          data: Array.from({ length: 6 }, () => randomInt(200, 1500)),
           borderColor: '#36A2EB',
           fill: false
         }]
@@ -210,7 +292,7 @@
       data: {
         labels: ['Chrome', 'Firefox', 'Safari'],
         datasets: [{
-          data: [55, 25, 20],
+          data: [randomInt(30, 60), randomInt(10, 40), randomInt(5, 30)],
           backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
         }]
       },

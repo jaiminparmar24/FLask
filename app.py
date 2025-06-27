@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mail import Mail, Message
 
+import pytz
 import random
 import os
 import time
@@ -52,19 +53,21 @@ def get_last_login(email):
         return None
 
 def update_last_login(email):
-    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    india = pytz.timezone("Asia/Kolkata")
+    now = datetime.now(india).strftime('%Y-%m-%d %H:%M:%S')
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
 
 def send_to_google_script(email, status):
+    india = pytz.timezone("Asia/Kolkata")
     url = "https://script.google.com/macros/s/AKfycbye0Ky4KMKw1O3oQj3ctxqpDPyIZu8PyEn8mt7pQOUiLkqvSZ4OUi-oshm2XEUs8PdMjw/exec"
     login_time = session.get('login_time')
 
     data = {
         "email": email,
-        "time": (login_time or datetime.now()).strftime("%Y-%m-%d %H:%M:%S"),
+        "time": (login_time or datetime.now(india)).strftime("%Y-%m-%d %H:%M:%S"),
         "status": status
     }
 
@@ -75,19 +78,17 @@ def send_to_google_script(email, status):
 
 # ✅ UPDATED send_otp FUNCTION
 def send_otp(email):
-    from datetime import datetime
-
     session.pop('otp', None)
     session.pop('otp_time', None)
 
+    india = pytz.timezone("Asia/Kolkata")
     otp = str(random.randint(1000, 9999))
     session['otp'] = otp
     session['otp_time'] = time.time()
     session['email'] = email
     session['otp_attempts'] = 0
 
-    # ✅ Add time in subject
-    current_time = datetime.now().strftime("%d %B %Y, %I:%M %p")
+    current_time = datetime.now(india).strftime("%d %B %Y, %I:%M %p")
     subject_line = f"🔐 Your OTP for JAIMIN's Login – {current_time}"
 
     msg = Message(
@@ -99,8 +100,7 @@ def send_otp(email):
 
     msg.body = f"Your OTP is: {otp}"
 
-    msg.html = f"""
-    <!DOCTYPE html>
+    msg.html = f"""<!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
@@ -177,7 +177,6 @@ def send_otp(email):
         print("❌ Failed to send email:", e)
         raise e
 
-
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
@@ -219,9 +218,10 @@ def verify():
             return render_template('verify.html', error="⏰ OTP expired. Please login again.")
 
         if user_otp == session.get('otp'):
+            india = pytz.timezone("Asia/Kolkata")
             session['verified'] = True
             session['logged_in'] = True
-            session['login_time'] = datetime.now()
+            session['login_time'] = datetime.now(india)
             session['ip'] = request.remote_addr
             session['browser'] = request.user_agent.string
             update_last_login(session['email'])

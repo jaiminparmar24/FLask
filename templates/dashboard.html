@@ -188,6 +188,47 @@
       <a href="#" class="nav-link">Dashboard</a>
       <a href="https://jaiminparmar24.github.io/Password" class="nav-link">Profile</a>
       <a href="#" onclick="getLocation()" class="nav-link">Location</a>
+      <div class="qr-generator" style="text-align: center; padding: 20px;">
+  <h2>🔗 QR Code Generator</h2>
+  <input type="text" id="urlInput" placeholder="Enter URL here" style="padding: 10px; width: 300px; border-radius: 8px; border: 1px solid #ccc;">
+  <button onclick="generateQR()" style="padding: 10px 20px; border-radius: 8px; background-color: #333; color: white; border: none;">Generate QR</button>
+  
+  <div id="qrResult" style="margin-top: 20px;"></div>
+</div>
+
+<script>
+  function generateQR() {
+    const url = document.getElementById("urlInput").value;
+
+    if (!url) {
+      alert("Please enter a URL.");
+      return;
+    }
+
+    fetch("/generate_qr", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: "url=" + encodeURIComponent(url)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("QR generation failed");
+      }
+      return response.blob();
+    })
+    .then(blob => {
+      const imgUrl = URL.createObjectURL(blob);
+      document.getElementById("qrResult").innerHTML = `<img src="${imgUrl}" alt="QR Code" style="margin-top:10px; border:1px solid #ccc; padding:5px;" />`;
+    })
+    .catch(error => {
+      console.error(error);
+      alert("Something went wrong while generating QR code.");
+    });
+  }
+</script>
+
       <a href="/logout" class="logout">Logout</a>
     </div>
 

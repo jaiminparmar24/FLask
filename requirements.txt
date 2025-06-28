@@ -1,1 +1,1 @@
-FlaskFlask-Mailpytzrequestsgunicorn
+FlaskFlask-Mailpytzrequestsgunicornqrcode

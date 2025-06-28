@@ -14,6 +14,7 @@ import io
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
+# ✅ Robots.txt and Sitemap.xml Routes
 @app.route("/robots.txt")
 def robots():
     return send_from_directory("static", "robots.txt")
@@ -22,6 +23,7 @@ def robots():
 def sitemap():
     return send_from_directory("static", "sitemap.xml")
 
+# ✅ Maintenance Mode
 @app.before_request
 def check_maintenance():
     if os.environ.get('MAINTENANCE_MODE') == 'on' and request.endpoint != 'maintenance':
@@ -69,20 +71,6 @@ def update_last_login(email):
         c = conn.cursor()
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
-
-# ✅ IP & Location Fetcher
-def get_user_location(ip):
-    try:
-        res = requests.get(f"https://ipinfo.io/{ip}/json").json()
-        return {
-            'ip': ip,
-            'city': res.get('city', 'Unknown'),
-            'region': res.get('region', 'Unknown'),
-            'country': res.get('country', 'Unknown'),
-            'org': res.get('org', 'Unknown')
-        }
-    except:
-        return {'ip': ip, 'city': 'N/A', 'region': 'N/A', 'country': 'N/A', 'org': 'N/A'}
 
 # ✅ Google Script Logger
 def send_to_google_script(email, status):
@@ -154,6 +142,7 @@ def send_otp(email):
         print("❌ Email failed:", e)
         raise e
 
+# ✅ Routes
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
@@ -213,9 +202,7 @@ def dashboard():
         return redirect(url_for('login'))
 
     last_login = get_last_login(session['email'])
-    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-    location = get_user_location(ip)
-    return render_template('dashboard.html', email=session['email'], last_login=last_login, location=location)
+    return render_template('dashboard.html', email=session['email'], last_login=last_login)
 
 @app.route('/logout')
 def logout():
@@ -229,12 +216,14 @@ def logout():
 def maintenance():
     return render_template("maintenance.html"), 503
 
+# ✅ QR Code Generator Route
 @app.route('/generate_qr', methods=['POST'])
 def generate_qr():
     url = request.form.get('url')
     if not url:
         return "No URL provided", 400
 
+    # Generate QR Code
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -245,13 +234,15 @@ def generate_qr():
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
 
+    # Save to memory buffer
     buf = io.BytesIO()
     img.save(buf)
     buf.seek(0)
 
+    # Optional Google Sheet logging (you can use same or separate sheet)
     try:
         requests.post(
-            "https://script.google.com/macros/s/YOUR_SECOND_SCRIPT_ID/exec",
+            "https://script.google.com/macros/s/YOUR_SECOND_SCRIPT_ID/exec",  # Optional logging
             json={
                 "url": url,
                 "ip": request.remote_addr

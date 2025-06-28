@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file
 from flask_mail import Mail, Message
 
 import pytz
@@ -8,6 +8,8 @@ import time
 import sqlite3
 import requests
 from datetime import datetime
+import qrcode
+import io
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -213,6 +215,43 @@ def logout():
 @app.route('/maintenance')
 def maintenance():
     return render_template("maintenance.html"), 503
+
+# ✅ QR Code Generator Route
+@app.route('/generate_qr', methods=['POST'])
+def generate_qr():
+    url = request.form.get('url')
+    if not url:
+        return "No URL provided", 400
+
+    # Generate QR Code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    # Save to memory buffer
+    buf = io.BytesIO()
+    img.save(buf)
+    buf.seek(0)
+
+    # Optional Google Sheet logging (you can use same or separate sheet)
+    try:
+        requests.post(
+            "https://script.google.com/macros/s/YOUR_SECOND_SCRIPT_ID/exec",  # Optional logging
+            json={
+                "url": url,
+                "ip": request.remote_addr
+            }
+        )
+    except Exception as e:
+        print("QR log failed:", e)
+
+    return send_file(buf, mimetype='image/png')
 
 if __name__ == '__main__':
     app.run(debug=True)

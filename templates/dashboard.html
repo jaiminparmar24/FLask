@@ -8,6 +8,7 @@
   <meta name="keywords" content="dashboard, JAIMIN, Flask dashboard, user analytics, interactive dashboard, dark mode UI">
   <meta name="author" content="Jaimin Parmar">
   <meta name="robots" content="index, follow">
+  <meta name="google-site-verification" content="5Q2w2DNziS6aGw83dWomTOjfuIDMzY26NkFmeCWxjFA">
   <meta property="og:title" content="JAIMIN | Dashboard">
   <meta property="og:description" content="Modern dashboard for monitoring user activity and stats.">
   <meta property="og:image" content="https://jaiminparmar24.github.io/assets/dashboard-preview.jpg">
@@ -16,13 +17,20 @@
   <link rel="icon" href="https://jaiminparmar24.github.io/favicon.ico" type="image/x-icon">
   <link rel="canonical" href="https://jaiminparmar24.github.io/dashboard">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
       background-color: #f4f4f4;
       color: #333;
     }
-    body.dark-mode { background-color: #121212; color: #f0f0f0; }
+    body.dark-mode {
+      background-color: #121212;
+      color: #f0f0f0;
+    }
     header {
       display: flex;
       justify-content: space-between;
@@ -33,7 +41,9 @@
       position: relative;
       z-index: 1001;
     }
-    header h1 { font-size: 1.2rem; }
+    header h1 {
+      font-size: 1.2rem;
+    }
     .menu-toggle {
       display: none;
       font-size: 24px;
@@ -61,7 +71,9 @@
       border-radius: 6px;
     }
     @media (max-width: 768px) {
-      .menu-toggle { display: block; }
+      .menu-toggle {
+        display: block;
+      }
       nav {
         display: none;
         flex-direction: column;
@@ -83,7 +95,9 @@
         to { opacity: 1; transform: translateY(0); }
       }
     }
-    .container { padding: 20px; }
+    .container {
+      padding: 20px;
+    }
     .topbar {
       display: flex;
       flex-direction: column;
@@ -112,7 +126,7 @@
       border-radius: 10px;
       text-align: center;
     }
-    .qr-section, .ip-section {
+    .qr-section {
       margin: 20px 0;
     }
     .qr-section input {
@@ -129,14 +143,6 @@
       color: white;
       border-radius: 6px;
       cursor: pointer;
-    }
-    .ip-section {
-      background: #eee;
-      padding: 15px;
-      border-radius: 10px;
-    }
-    .ip-section h2 {
-      margin-bottom: 10px;
     }
     footer {
       margin-top: 20px;
@@ -166,49 +172,32 @@
         <div id="clock"></div>
       </div>
     </div>
-
     <div class="cards">
       <div class="card"><h4>Total Users</h4><p id="userCount">-</p></div>
       <div class="card"><h4>Messages</h4><p id="messageCount">-</p></div>
       <div class="card"><h4>Visits</h4><p id="visitCount">-</p></div>
     </div>
-
-    <!-- 🔗 QR Code Generator -->
     <div class="qr-section">
       <h2>🔗 QR Code Generator</h2>
       <input type="text" id="urlInput" placeholder="Enter URL here">
       <button onclick="generateQR()">Generate QR</button>
       <div id="qrResult"></div>
     </div>
-
-    <!-- 📍 IP & Location Finder -->
-    <div class="ip-section">
-      <h2>📍 Your IP & Location</h2>
-      <p><b>IP:</b> {{ ip }}</p>
-      <p><b>City:</b> {{ city }}</p>
-      <p><b>Region:</b> {{ region }}</p>
-      <p><b>Country:</b> {{ country }}</p>
-      <p><b>ISP:</b> {{ org }}</p>
-    </div>
-
     <footer>
       <h3>Recent Activity</h3>
       <ul id="activityList"></ul>
     </footer>
   </div>
-
   <script>
     const email = "{{ email }}";
     const hour = new Date().getHours();
     let greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
     document.getElementById("greetingText").textContent = `${greeting}, ${email}`;
-
     function updateClock() {
       document.getElementById('clock').textContent = new Date().toLocaleTimeString();
     }
     setInterval(updateClock, 1000);
     updateClock();
-
     function getLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
@@ -217,14 +206,12 @@
         }, () => alert("Location access denied."));
       } else alert("Geolocation not supported.");
     }
-
     function randomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
     document.getElementById("userCount").textContent = randomInt(1000, 5000);
     document.getElementById("messageCount").textContent = randomInt(500, 3000);
     document.getElementById("visitCount").textContent = randomInt(5000, 15000);
-
     const activities = ["User logged in", "New file uploaded", "Settings updated", "Feedback submitted", "Comment received", "Security alert"];
     const activityList = document.getElementById("activityList");
     for (let i = 0; i < 5; i++) {
@@ -232,7 +219,6 @@
       li.textContent = `${activities[randomInt(0, activities.length - 1)]} - ${randomInt(1, 59)} mins ago`;
       activityList.appendChild(li);
     }
-
     function generateQR() {
       const url = document.getElementById("urlInput").value;
       if (!url) {
@@ -251,7 +237,6 @@
       })
       .catch(() => alert("QR generation failed."));
     }
-
     function toggleMenu() {
       const nav = document.getElementById('mainNav');
       nav.classList.toggle('nav-visible');

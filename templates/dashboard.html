@@ -99,6 +99,7 @@
       display: flex;
       gap: 10px;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .right-controls input[type="search"],
@@ -151,8 +152,14 @@
       background: #ff6a00;
     }
 
+    .container {
+      display: flex;
+      height: 100vh;
+      flex-direction: row;
+    }
+
     @media (max-width: 768px) {
-      body {
+      .container {
         flex-direction: column;
       }
 
@@ -160,18 +167,33 @@
         width: 100%;
         flex-direction: row;
         overflow-x: auto;
-        justify-content: space-around;
+        justify-content: space-between;
+        padding: 10px;
+      }
+
+      .main {
+        padding: 15px;
       }
 
       .topbar {
         flex-direction: column;
         align-items: flex-start;
+        gap: 10px;
       }
-    }
 
-    .container {
-      display: flex;
-      height: 100vh;
+      .right-controls {
+        width: 100%;
+      }
+
+      .right-controls input[type="search"],
+      .right-controls select {
+        width: 100%;
+        margin-top: 5px;
+      }
+
+      .qr-generator input {
+        width: 100% !important;
+      }
     }
 
     ul#activityList {
@@ -189,46 +211,11 @@
       <a href="https://jaiminparmar24.github.io/Password" class="nav-link">Profile</a>
       <a href="#" onclick="getLocation()" class="nav-link">Location</a>
       <div class="qr-generator" style="text-align: center; padding: 20px;">
-  <h2>🔗 QR Code Generator</h2>
-  <input type="text" id="urlInput" placeholder="Enter URL here" style="padding: 10px; width: 300px; border-radius: 8px; border: 1px solid #ccc;">
-  <button onclick="generateQR()" style="padding: 10px 20px; border-radius: 8px; background-color: #333; color: white; border: none;">Generate QR</button>
-  
-  <div id="qrResult" style="margin-top: 20px;"></div>
-</div>
-
-<script>
-  function generateQR() {
-    const url = document.getElementById("urlInput").value;
-
-    if (!url) {
-      alert("Please enter a URL.");
-      return;
-    }
-
-    fetch("/generate_qr", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: "url=" + encodeURIComponent(url)
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("QR generation failed");
-      }
-      return response.blob();
-    })
-    .then(blob => {
-      const imgUrl = URL.createObjectURL(blob);
-      document.getElementById("qrResult").innerHTML = `<img src="${imgUrl}" alt="QR Code" style="margin-top:10px; border:1px solid #ccc; padding:5px;" />`;
-    })
-    .catch(error => {
-      console.error(error);
-      alert("Something went wrong while generating QR code.");
-    });
-  }
-</script>
-
+        <h2>🔗 QR Code Generator</h2>
+        <input type="text" id="urlInput" placeholder="Enter URL here" style="padding: 10px; width: 300px; border-radius: 8px; border: 1px solid #ccc;">
+        <button onclick="generateQR()" style="padding: 10px 20px; border-radius: 8px; background-color: #333; color: white; border: none;">Generate QR</button>
+        <div id="qrResult" style="margin-top: 20px;"></div>
+      </div>
       <a href="/logout" class="logout">Logout</a>
     </div>
 
@@ -262,8 +249,7 @@
   </div>
 
   <script>
-    // Greeting
-    const email = "user@example.com";  // This should be dynamically rendered by Flask
+    const email = "{{ email }}";  // Flask will insert actual user email
     const hour = new Date().getHours();
     let greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
     document.getElementById("greetingText").textContent = `${greeting}, ${email}`;
@@ -305,6 +291,37 @@
       const li = document.createElement("li");
       li.textContent = `${activities[randomInt(0, activities.length - 1)]} - ${randomInt(1, 59)} mins ago`;
       activityList.appendChild(li);
+    }
+
+    function generateQR() {
+      const url = document.getElementById("urlInput").value;
+
+      if (!url) {
+        alert("Please enter a URL.");
+        return;
+      }
+
+      fetch("/generate_qr", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "url=" + encodeURIComponent(url)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("QR generation failed");
+        }
+        return response.blob();
+      })
+      .then(blob => {
+        const imgUrl = URL.createObjectURL(blob);
+        document.getElementById("qrResult").innerHTML = `<img src="${imgUrl}" alt="QR Code" style="margin-top:10px; border:1px solid #ccc; padding:5px;" />`;
+      })
+      .catch(error => {
+        console.error(error);
+        alert("Something went wrong while generating QR code.");
+      });
     }
   </script>
 </body>

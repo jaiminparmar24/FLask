@@ -1,45 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <title>Verify OTP | JAIMIN LOGIN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify OTP | JAIMIN LOGIN</title>
   <style>
     * {
       box-sizing: border-box;
-    }
-
-    body {
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #141e30, #243b55);
+    }
+
+    body {
+      background: linear-gradient(to bottom right, #f9fbfc, #e1f0ff);
+      color: #333;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       animation: fadeIn 1.5s ease-in;
+      padding: 20px;
     }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.05);
+      background: #ffffff;
       padding: 40px;
       border-radius: 20px;
-      box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
-      backdrop-filter: blur(15px);
-      width: 90%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      width: 100%;
       max-width: 400px;
       text-align: center;
-      color: #fff;
       animation: slideUp 1s ease-out;
     }
 
@@ -58,11 +55,10 @@
       font-size: 2rem;
       font-weight: bold;
       margin-bottom: 20px;
-      color: #00ffff;
+      color: #0077cc;
       letter-spacing: 2px;
     }
 
-    /* New OTP container for separate boxes */
     .otp-container {
       display: flex;
       justify-content: space-between;
@@ -76,8 +72,8 @@
       font-weight: bold;
       text-align: center;
       border-radius: 10px;
-      border: 2px solid #00ffff;
-      background-color: rgba(255, 255, 255, 0.9);
+      border: 2px solid #0077cc;
+      background-color: #f0f9ff;
       color: #000;
       outline: none;
       transition: border-color 0.3s;
@@ -85,8 +81,8 @@
     }
 
     .otp-container input:focus {
-      border-color: #00cccc;
-      box-shadow: 0 0 10px #00ffff;
+      border-color: #005fa3;
+      box-shadow: 0 0 10px #0077cc;
     }
 
     button {
@@ -95,15 +91,15 @@
       font-size: 1rem;
       border: none;
       border-radius: 10px;
-      background: #00ffff;
-      color: #000;
+      background: #0077cc;
+      color: #fff;
       font-weight: bold;
       cursor: pointer;
       transition: background 0.3s ease;
     }
 
     button:hover {
-      background: #00cccc;
+      background: #005fa3;
     }
 
     #resendBtn {
@@ -112,20 +108,20 @@
     }
 
     #resendBtn:disabled {
-      background: #999;
+      background: #ccc;
       cursor: not-allowed;
     }
 
     #timer {
       margin-top: 15px;
       font-weight: bold;
-      color: #ffeb3b;
+      color: #e65100;
       font-size: 1rem;
     }
 
     .success {
       display: none;
-      color: #00ffab;
+      color: #28a745;
       font-weight: bold;
       margin-top: 10px;
       animation: popUp 0.8s ease-in-out forwards;
@@ -145,7 +141,7 @@
     .footer {
       margin-top: 20px;
       font-size: 0.85rem;
-      color: #ccc;
+      color: #888;
     }
 
     @media (max-width: 480px) {
@@ -164,54 +160,25 @@
         font-size: 1.7rem;
       }
     }
-
-    @keyframes shake {
-      0% {
-        transform: translateX(0);
-      }
-      25% {
-        transform: translateX(-5px);
-      }
-      50% {
-        transform: translateX(5px);
-      }
-      75% {
-        transform: translateX(-5px);
-      }
-      100% {
-        transform: translateX(0);
-      }
-    }
   </style>
 </head>
+
 <body>
   <div class="card">
     <div class="logo">OTP Verification</div>
 
     {% if error %}
-    <div
-      style="
-        background-color: #ff4d4d;
-        color: white;
-        padding: 15px;
-        border-radius: 8px;
-        text-align: center;
-        font-size: 18px;
-        margin-bottom: 20px;
-        animation: shake 0.3s;
-      "
-    >
+    <div style="background-color: #f44336; color: white; padding: 15px; border-radius: 8px; text-align: center; font-size: 18px; margin-bottom: 20px; animation: shake 0.3s;">
       ❌ {{ error }}
     </div>
     {% endif %}
 
     <form method="POST" id="otpForm">
       <div class="otp-container">
-        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp1" required />
-        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp2" required />
-        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp3" required />
-        <input type="text" inputmode="numeric" pattern="\d" maxlength="1" name="otp4" required />
-        
+        <input type="text" inputmode="numeric" maxlength="1" name="otp1" required />
+        <input type="text" inputmode="numeric" maxlength="1" name="otp2" required />
+        <input type="text" inputmode="numeric" maxlength="1" name="otp3" required />
+        <input type="text" inputmode="numeric" maxlength="1" name="otp4" required />
       </div>
       <button type="submit" id="verifyBtn">✅ Verify OTP</button>
       <button type="submit" name="resend" id="resendBtn" disabled>🔁 Resend OTP</button>
@@ -228,17 +195,15 @@
     const resendBtn = document.getElementById("resendBtn");
     const timerEl = document.getElementById("timer");
 
-    // Automatically move to next input after typing a digit
     inputs.forEach((input, index) => {
       input.addEventListener("input", (e) => {
         const value = e.target.value;
-        e.target.value = value.replace(/[^0-9]/g, ""); // only digits
+        e.target.value = value.replace(/[^0-9]/g, "");
         if (value.length === 1 && index < inputs.length - 1) {
           inputs[index + 1].focus();
         }
       });
 
-      // Handle backspace to move focus backward
       input.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" && input.value === "" && index > 0) {
           inputs[index - 1].focus();
@@ -246,18 +211,14 @@
       });
     });
 
-    // Combine OTP digits into one string before submit
     const form = document.getElementById("otpForm");
     form.addEventListener("submit", (e) => {
-      // Prevent multiple submit clicks if needed
-      // Optional: check if all inputs filled
       const otpValue = Array.from(inputs).map(i => i.value).join("");
       if (otpValue.length < 4) {
         e.preventDefault();
-        alert("Please enter all 6 digits of the OTP.");
+        alert("Please enter all digits of the OTP.");
         return false;
       }
-      // Add a hidden input with combined OTP to send to server
       let existing = form.querySelector('input[name="otp"]');
       if (!existing) {
         const hiddenOtp = document.createElement("input");
@@ -266,11 +227,9 @@
         form.appendChild(hiddenOtp);
       }
       form.querySelector('input[name="otp"]').value = otpValue;
-      // Remove individual inputs' name attributes so server receives only combined otp
       inputs.forEach(i => i.removeAttribute("name"));
     });
 
-    // Timer and resend button logic (same as your original)
     let timeLeft = 300;
     let resendCooldown = 30;
 
@@ -318,4 +277,5 @@
     }
   </script>
 </body>
+
 </html>

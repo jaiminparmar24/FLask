@@ -6,27 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🔐 JAIMIN PARMAR | Secure OTP Login</title>
 
-  <!-- ✅ SEO -->
+  <!-- ✅ SEO & Social Metadata (unchanged) -->
   <meta name="description" content="Securely login to JAIMIN PARMAR's portal using email-based OTP verification.">
   <meta name="keywords" content="OTP login, email authentication, secure login, Flask">
   <meta name="author" content="Jaimin Parmar">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://yourapp.onrender.com/">
-
-  <!-- ✅ Open Graph -->
   <meta property="og:title" content="Jaimin Parmar Login Portal 🔐">
   <meta property="og:description" content="Login securely to the official OTP-based portal by Jaimin Parmar.">
   <meta property="og:image" content="https://yourapp.onrender.com/static/logo.png">
   <meta property="og:url" content="https://yourapp.onrender.com/">
   <meta property="og:type" content="website">
-
-  <!-- ✅ Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="JAIMIN PARMAR Login Page 🔐">
   <meta name="twitter:description" content="Secure email OTP login system built by JAIMIN PARMAR.">
   <meta name="twitter:image" content="https://yourapp.onrender.com/static/logo.png">
-
-  <!-- ✅ Structured Data -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -44,7 +38,7 @@
   <link rel="dns-prefetch" href="//fonts.googleapis.com">
   <link rel="prefetch" href="/static/logo.png" as="image">
 
-  <!-- ✅ Embedded CSS -->
+  <!-- ✅ Light Theme + Animation CSS -->
   <style>
     * {
       margin: 0;
@@ -54,8 +48,8 @@
     }
 
     body {
-      background: #0e0e0e;
-      color: #f0f0f0;
+      background: linear-gradient(to bottom right, #f9fbfc, #e1f0ff);
+      color: #333;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -64,13 +58,14 @@
     }
 
     .card {
-      background: #1e1e1e;
+      background: #ffffff;
       padding: 30px;
       border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0, 255, 255, 0.2);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       width: 100%;
       max-width: 400px;
       text-align: center;
+      animation: fadeIn 1s ease-in-out;
       transition: transform 0.3s ease;
     }
 
@@ -81,55 +76,58 @@
     .card h1 {
       font-size: 1.8rem;
       margin-bottom: 15px;
-      color: #00ffff;
+      color: #0077cc;
     }
 
     .summary {
       font-size: 1rem;
       margin-bottom: 25px;
-      color: #aaa;
+      color: #666;
     }
 
     form {
       display: flex;
       flex-direction: column;
       gap: 15px;
+      animation: slideUp 1s ease-in-out;
     }
 
     input[type="email"] {
       padding: 12px;
-      border: none;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      background: #2a2a2a;
-      color: #fff;
+      background: #f8f8f8;
+      color: #333;
       font-size: 1rem;
       transition: all 0.3s ease;
     }
 
     input[type="email"]:focus {
-      outline: 2px solid #00ffff;
+      outline: 2px solid #0077cc;
+      background-color: #fff;
     }
 
     button[type="submit"] {
       padding: 12px;
-      background: #00ffff;
+      background: #0077cc;
       border: none;
       border-radius: 8px;
-      color: #000;
+      color: #fff;
       font-weight: bold;
       font-size: 1rem;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, transform 0.2s;
     }
 
     button[type="submit"]:hover {
-      background: #00e0e0;
+      background: #005fa3;
+      transform: scale(1.02);
     }
 
     .footer {
       margin-top: 20px;
       font-size: 0.9rem;
-      color: #666;
+      color: #888;
     }
 
     @media (max-width: 480px) {
@@ -146,6 +144,29 @@
         font-size: 0.95rem;
       }
     }
+
+    /* ✅ Animations */
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 
@@ -154,7 +175,7 @@
     <h1>JAIMIN PARMAR | Login Portal</h1>
     <div class="summary">
       Welcome to our login page.<br>
-      <strong style="color:#00ffff;">Designed by JAIMIN</strong>
+      <strong style="color:#0077cc;">Designed by JAIMIN</strong>
     </div>
     <form method="POST" action="/">
       <label for="email" hidden>Email</label>

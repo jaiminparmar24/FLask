@@ -8,6 +8,7 @@ Welcome to the **secure email OTP login system** built using Flask, Python, and 
 - Google Sheet logging
 - Mobile responsive UI
 - Real-time user tracking
+- Free QR Code Generator By URL
 
 🚀 Visit the Live Website:
 👉 [JAIMIN Login Page](https://flask-hblv.onrender.com)

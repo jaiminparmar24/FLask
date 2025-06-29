@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Verify OTP | JAIMIN LOGIN</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
   <!-- ✅ SEO META TAGS -->
   <meta name="description" content="Secure OTP verification page for JAIMIN PARMAR Login. Enter your one-time password to verify identity. Trusted and encrypted.">
-  <meta name="keywords" content="OTP, JAIMIN, verify OTP, one time password, secure login, authentication">
+  <meta name="keywords" content="OTP, JAIMIN, verify OTP, one time password, secure login, authentication, secure OTP page, Flask OTP">
   <meta name="author" content="Jaimin Parmar">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://flask-hblv.onrender.com/verify">
@@ -19,12 +19,14 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://flask-hblv.onrender.com/verify">
   <meta property="og:image" content="https://flask-hblv.onrender.com/static/otp-preview.jpg">
+  <meta property="og:site_name" content="JAIMIN LOGIN">
 
   <!-- ✅ Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Verify OTP | JAIMIN LOGIN">
   <meta name="twitter:description" content="Secure OTP page by JAIMIN PARMAR to protect your access.">
   <meta name="twitter:image" content="https://flask-hblv.onrender.com/static/otp-preview.jpg">
+  <meta name="twitter:site" content="@jaiminparmar024">
 
   <!-- ✅ JSON-LD Structured Data -->
   <script type="application/ld+json">
@@ -41,8 +43,14 @@
   }
   </script>
 
-  <!-- ✅ Favicon -->
+  <!-- ✅ Favicon & Performance -->
   <link rel="icon" href="https://flask-hblv.onrender.com/static/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="https://flask-hblv.onrender.com/static/otp-preview.jpg">
+  <meta name="theme-color" content="#0077cc">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/static/site.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
 
   <!-- ✅ Google Analytics GA4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-EGSF4CKJMQ"></script>
@@ -53,6 +61,7 @@
     gtag('config', 'G-EGSF4CKJMQ');
   </script>
 
+  <!-- ✅ Styles -->
   <style>
     * {
       box-sizing: border-box;
@@ -60,7 +69,6 @@
       padding: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
     body {
       background: linear-gradient(to bottom right, #f9fbfc, #e1f0ff);
       color: #333;
@@ -71,12 +79,10 @@
       animation: fadeIn 1.5s ease-in;
       padding: 20px;
     }
-
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
-
     .card {
       background: #ffffff;
       padding: 40px;
@@ -87,7 +93,6 @@
       text-align: center;
       animation: slideUp 1s ease-out;
     }
-
     @keyframes slideUp {
       from {
         transform: translateY(30px);
@@ -98,7 +103,6 @@
         opacity: 1;
       }
     }
-
     .logo {
       font-size: 2rem;
       font-weight: bold;
@@ -106,13 +110,11 @@
       color: #0077cc;
       letter-spacing: 2px;
     }
-
     .otp-container {
       display: flex;
       justify-content: space-between;
       margin: 20px 0 30px 0;
     }
-
     .otp-container input {
       width: 50px;
       height: 55px;
@@ -125,14 +127,11 @@
       color: #000;
       outline: none;
       transition: border-color 0.3s;
-      user-select: none;
     }
-
     .otp-container input:focus {
       border-color: #005fa3;
       box-shadow: 0 0 10px #0077cc;
     }
-
     button {
       width: 100%;
       padding: 14px;
@@ -145,28 +144,23 @@
       cursor: pointer;
       transition: background 0.3s ease;
     }
-
     button:hover {
       background: #005fa3;
     }
-
     #resendBtn {
       margin-top: 10px;
       background: #ff9800;
     }
-
     #resendBtn:disabled {
       background: #ccc;
       cursor: not-allowed;
     }
-
     #timer {
       margin-top: 15px;
       font-weight: bold;
       color: #e65100;
       font-size: 1rem;
     }
-
     .success {
       display: none;
       color: #28a745;
@@ -174,37 +168,19 @@
       margin-top: 10px;
       animation: popUp 0.8s ease-in-out forwards;
     }
-
     @keyframes popUp {
-      from {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
     }
-
     .footer {
       margin-top: 20px;
       font-size: 0.85rem;
       color: #888;
     }
-
     @media (max-width: 480px) {
-      .card {
-        padding: 25px;
-      }
-
-      .logo {
-        font-size: 1.5rem;
-      }
-
-      #timer {
-        font-size: 0.9rem;
-      }
-
+      .card { padding: 25px; }
+      .logo { font-size: 1.5rem; }
+      #timer { font-size: 0.9rem; }
       .otp-container input {
         width: 40px;
         height: 50px;
@@ -254,7 +230,6 @@
           inputs[index + 1].focus();
         }
       });
-
       input.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" && input.value === "" && index > 0) {
           inputs[index - 1].focus();
@@ -289,7 +264,6 @@
       const seconds = String(timeLeft % 60).padStart(2, "0");
       timerEl.textContent = `OTP expires in: ${minutes}:${seconds}`;
       timeLeft--;
-
       if (timeLeft < 0) {
         timerEl.textContent = "⛔ OTP expired. Please request a new one.";
         verifyBtn.disabled = true;
@@ -297,14 +271,12 @@
         resendBtn.disabled = false;
         return;
       }
-
       setTimeout(updateTimer, 1000);
     }
 
     function startResendCooldown() {
       resendBtn.disabled = true;
       let cooldown = resendCooldown;
-
       function countdown() {
         resendBtn.textContent = `🔁 Resend OTP (${cooldown}s)`;
         cooldown--;
@@ -315,7 +287,6 @@
           setTimeout(countdown, 1000);
         }
       }
-
       countdown();
     }
 
@@ -328,5 +299,4 @@
     }
   </script>
 </body>
-
 </html>

@@ -2,20 +2,19 @@
 <html lang="en" dir="ltr">
 
 <head>
-  <!-- ✅ Basic Meta -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>🔐 JAIMIN PARMAR | Secure OTP Login</title>
 
-  <!-- ✅ SEO Essentials -->
+  <!-- ✅ SEO & Social -->
   <meta name="description" content="Securely login to JAIMIN PARMAR's portal using email-based OTP verification. Real-time tools like IP finder, password manager & more.">
   <meta name="keywords" content="OTP login, email authentication, secure login, Flask login, password manager, IP tracker, Jaimin Parmar, OTP system" />
   <meta name="author" content="Jaimin Parmar" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://flask-hblv.onrender.com/" />
 
-  <!-- ✅ Open Graph Tags (for Facebook, LinkedIn) -->
+  <!-- ✅ Open Graph -->
   <meta property="og:title" content="🔐 Jaimin Parmar Login Portal | Secure OTP Access" />
   <meta property="og:description" content="Login securely to the official OTP-based portal by Jaimin Parmar with modern tools and UI." />
   <meta property="og:image" content="https://flask-hblv.onrender.com/static/logo.png" />
@@ -30,43 +29,10 @@
   <meta name="twitter:image" content="https://flask-hblv.onrender.com/static/logo.png" />
   <meta name="twitter:site" content="@jaiminparmar024" />
 
-  <!-- ✅ JSON-LD Structured Data -->
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": "JAIMIN PARMAR | OTP Login",
-      "url": "https://flask-hblv.onrender.com/",
-      "description": "Secure email-based OTP login system built with Flask. Includes real-time dashboard, IP & password tools.",
-      "author": {
-        "@type": "Person",
-        "name": "Jaimin Parmar"
-      },
-      "inLanguage": "en"
-    }
-  </script>
+  <!-- ✅ Typed.js & Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
 
-  <!-- ✅ Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-EGSF4CKJMQ"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-EGSF4CKJMQ');
-  </script>
-
-  <!-- ✅ Icons & Performance Optimizations -->
-  <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="/static/logo.png" />
-  <link rel="manifest" href="/static/site.webmanifest" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
-  <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-  <link rel="prefetch" href="/static/logo.png" as="image" />
-  <meta name="theme-color" content="#0077cc" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="msapplication-TileColor" content="#0077cc" />
-
-  <!-- ✅ Light Theme + Animation CSS -->
   <style>
     * {
       margin: 0;
@@ -83,6 +49,7 @@
       justify-content: center;
       align-items: center;
       padding: 20px;
+      transition: background 0.3s, color 0.3s;
     }
 
     .card {
@@ -101,7 +68,7 @@
       transform: translateY(-5px);
     }
 
-    .card h1 {
+    h1 {
       font-size: 1.8rem;
       margin-bottom: 15px;
       color: #0077cc;
@@ -124,9 +91,10 @@
       padding: 12px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      background: #f8f8f8;
+      background: #f8f8f8 url('https://img.icons8.com/ios-filled/20/0077cc/new-post.png') no-repeat 10px center;
       color: #333;
       font-size: 1rem;
+      padding-left: 40px;
       transition: all 0.3s ease;
     }
 
@@ -158,60 +126,134 @@
       color: #888;
     }
 
-    @media (max-width: 480px) {
-      .card {
-        padding: 20px;
-      }
-
-      .card h1 {
-        font-size: 1.4rem;
-      }
-
-      input[type="email"],
-      button[type="submit"] {
-        font-size: 0.95rem;
-      }
+    button#toggle-theme {
+      background: transparent;
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+      color: #333;
     }
 
-    /* ✅ Animations */
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid white;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     @keyframes fadeIn {
-      0% {
-        opacity: 0;
-        transform: scale(0.95);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
     @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 20px; }
+      h1 { font-size: 1.4rem; }
+      input[type="email"], button[type="submit"] { font-size: 0.95rem; }
+    }
+
+    /* ✅ Dark Mode */
+    body.dark {
+      background: #121212;
+      color: #fff;
+    }
+
+    body.dark .card {
+      background: #1e1e1e;
+      color: #eee;
+    }
+
+    body.dark input[type="email"] {
+      background: #2c2c2c;
+      color: #fff;
+      border-color: #555;
+    }
+
+    body.dark button[type="submit"] {
+      background: #00aaff;
     }
   </style>
 </head>
 
 <body>
   <main class="card">
-    <h1>JAIMIN PARMAR | Login Portal</h1>
+    <h1><span id="typed-text"></span></h1>
     <div class="summary">
       Welcome to our login page.<br>
       <strong style="color:#0077cc;">Designed by JAIMIN</strong>
     </div>
+
     <form method="POST" action="/">
       <label for="email" hidden>Email</label>
       <input type="email" id="email" name="email" placeholder="Enter your email" required />
-      <button type="submit">🔐 Send OTP</button>
+      <button type="submit" id="submitBtn"><span class="spinner" style="display:none;"></span>🔐 Send OTP</button>
     </form>
+
+    <button id="toggle-theme" onclick="toggleTheme()">🌓 Toggle Theme</button>
+
     <div class="footer">Safe • Secure • Fast Login</div>
+    <audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3" preload="auto"></audio>
   </main>
+
+  <script>
+    // Typing animation
+    new Typed('#typed-text', {
+      strings: ["Welcome Back!", "Secure OTP Login", "JAIMIN PARMAR Portal"],
+      typeSpeed: 50,
+      backSpeed: 30,
+      loop: true
+    });
+
+    // Email validation
+    const emailInput = document.getElementById('email');
+    emailInput.addEventListener('input', () => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      emailInput.style.borderColor = emailRegex.test(emailInput.value) ? "#00cc66" : "#ccc";
+    });
+
+    // Theme toggle
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+    }
+
+    // Spinner + sound on submit
+    const form = document.querySelector("form");
+    const button = document.getElementById("submitBtn");
+    const spinner = document.querySelector(".spinner");
+    form.addEventListener("submit", () => {
+      button.disabled = true;
+      spinner.style.display = "inline-block";
+      document.getElementById("clickSound").play();
+    });
+
+    // Toast + confetti
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('sent') === 'true') {
+      alert("✅ OTP has been sent to your email!");
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+  </script>
 </body>
 
 </html>

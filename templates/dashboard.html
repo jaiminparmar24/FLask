@@ -189,13 +189,13 @@
     <h1>JAIMIN PARMAR's Dashboard</h1>
     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
   </header>
-
-  <nav id="mainNav" class="nav-hidden">
-    <a href="#">Dashboard</a>
-    <a href="https://jaiminparmar24.github.io/Password">Contact Us</a>
-    <a href="#" onclick="getLocation()">Your Location</a>
-    <a href="/logout" style="color: red;">Logout</a>
-  </nav>
+<nav id="mainNav" class="nav-hidden">
+  <a href="#" onclick="document.getElementById('about').scrollIntoView({ behavior: 'smooth' });">📘 About Us</a>
+  <a href="#">Dashboard</a>
+  <a href="https://jaiminparmar24.github.io/Password">Contact Us</a>
+  <a href="#" onclick="getLocation()">Your Location</a>
+  <a href="/logout" style="color: red;">Logout</a>
+</nav>
 
   <div class="container">
     <div class="topbar">
@@ -251,8 +251,31 @@
       <h2>🔗 QR Code Generator</h2>
       <input type="text" id="urlInput" placeholder="Enter URL here">
       <button onclick="generateQR()">Generate QR</button>
-      <div id="qrResult"></div>
+      <div id="qrResult">
+  <img id="qrImage" style="margin-top:10px; border:1px solid #ccc; padding:5px; max-width:100%;" />
+  <br>
+  <a id="downloadBtn" href="#" download="yourqr.png" style="display:none; margin-top:10px; padding:10px; background:#0077cc; color:white; border-radius:6px; text-decoration:none;">⬇️ Download QR</a>
+</div>
+
     </div>
+<hr style="margin: 40px 0; border-top: 2px solid #ccc;" />
+<section id="about" style="padding: 20px; background: #eafaff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+  <h2 style="text-align:center; color:#0077cc;">📘 About Us</h2>
+  <p style="font-size: 16px; line-height: 1.7;">
+    This platform is developed and maintained by <strong>Jaimin Parmar</strong> as a part of a secure productivity toolset.
+    It is a completely free, secure, and personalized dashboard experience powered by modern technologies like:
+  </p>
+  <ul style="padding-left: 20px; margin-top: 10px;">
+    <li>🔐 OTP-based login with session security</li>
+    <li>📊 Real-time analytics, visit tracking, and user statistics</li>
+    <li>📁 Activity logs via Google Sheets (For Developer)</li>
+    <li>📎 QR Code generator and secure shareable links</li>
+    <li>🌙 Dark mode and mobile responsiveness</li>
+  </ul>
+  <p style="margin-top: 15px;">
+    Whether you're testing secure apps or exploring Python (Flask), this dashboard is a live example of performance, design, and usability working together.
+  </p>
+</section>
 
     <footer>
       <h3>Recent Activity</h3>
@@ -354,10 +377,16 @@
         body: "url=" + encodeURIComponent(url)
       })
       .then(response => response.blob())
-      .then(blob => {
-        const imgUrl = URL.createObjectURL(blob);
-        document.getElementById("qrResult").innerHTML = `<img src="${imgUrl}" alt="QR Code" style="margin-top:10px; border:1px solid #ccc; padding:5px; max-width:100%;" />`;
-      })
+    .then(blob => {
+  const imgUrl = URL.createObjectURL(blob);
+  const qrImg = document.getElementById("qrImage");
+  qrImg.src = imgUrl;
+
+  const downloadLink = document.getElementById("downloadBtn");
+  downloadLink.href = imgUrl;
+  downloadLink.style.display = "inline-block";
+})
+
       .catch(() => alert("QR generation failed."));
     }
 

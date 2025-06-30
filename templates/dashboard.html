@@ -220,7 +220,34 @@
       <div class="card"><h4>Visits</h4><p id="visitCount">0</p></div>
     </div>
 
-    <div class="qr-section">
+<hr style="border-top: 2px dashed #aaa;">
+
+<h2>🔐 Why This Website Exists</h2>
+<p>
+  In a world filled with passwords and privacy concerns, this platform offers a safer and smarter way to log in. No passwords are stored — only a one-time passcode sent directly to your inbox.
+</p>
+<p>
+  This site is built using Python (Flask), with features like:
+</p>
+<ul>
+  <li>Email OTP login system with session tracking</li>
+  <li>Google Sheets integration for logging activity (For Developer)</li>
+  <li>QR Code generator for secure and fast sharing</li>
+ 
+</ul>
+<hr style="border-top: 2px dashed #aaa;">
+
+
+<h2>⚙️ Features You Can Use</h2>
+<ul>
+  <li><strong>OTP Login:</strong> Fast and secure login using your email only</li>
+  <li><strong>Last Login Tracking:</strong> Know when and where you last logged in</li>
+  <li><strong>QR Code Generator:</strong> Instantly generate QR codes for any URL</li>
+  <li><strong>IP & Browser Detection:</strong> View your session details</li>
+  <li><strong>Google Sheets Logging:</strong> Keep all your activity securely recorded</li>
+</ul>
+
+ <div class="qr-section">
       <h2>🔗 QR Code Generator</h2>
       <input type="text" id="urlInput" placeholder="Enter URL here">
       <button onclick="generateQR()">Generate QR</button>
@@ -340,5 +367,9 @@
       nav.classList.toggle('nav-hidden');
     }
   </script>
+
+<p style="text-align:center; font-size:14px; color:#999;">
+  Crafted by Jaimin Parmar | Powered by Flask & Google Sheets
+</p>
 </body>
 </html>

@@ -48,7 +48,7 @@ Whether you're a developer looking to build secure login systems or simply explo
 - 🔐 **Encrypted password manager**
 - 📅 **Task planner & calendar widget**
 - 🤖 **AI Chat Assistant (Chatbot)**
-
+- Personal Telegram bot
 ---
 
 ## 🚀 Live Demo

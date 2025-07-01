@@ -1,10 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file
 from flask_mail import Mail, Message
 from datetime import datetime, timedelta
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
-import threading
-import yt_dlp
+
 import pytz
 import random
 import os
@@ -106,37 +103,6 @@ def send_otp(email):
     except Exception as e:
         print("❌ Failed to send email:", e)
 
-# === Telegram Bot ===
-BOT_TOKEN = os.environ.get("BOT_TOKEN")  # Best practice: use env var
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("🎥 Send me a video URL to download!")
-
-async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    url = update.message.text.strip()
-    msg = await update.message.reply_text("⏳ Downloading...")
-    try:
-        ydl_opts = {
-            'outtmpl': 'downloaded.%(ext)s',
-            'format': 'best[ext=mp4]',
-            'quiet': True
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
-            video_file = ydl.prepare_filename(info)
-        await update.message.reply_video(video=open(video_file, 'rb'), caption="✅ Here's your video!")
-        await msg.delete()
-        os.remove(video_file)
-    except Exception as e:
-        await msg.edit_text(f"❌ Error: `{str(e)}`", parse_mode="Markdown")
-
-
-def run_telegram_bot():
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_url))
-    print("✅ Telegram Bot running...")
-    app.run_polling()
 
 # === Flask Routes ===
 @app.route('/', methods=['GET', 'POST'])
@@ -207,7 +173,6 @@ def sitemap():
 def maintenance():
     return render_template('maintenance.html'), 503
 
-# === Run Both Flask + Telegram Bot ===
 if __name__ == '__main__':
-    threading.Thread(target=run_telegram_bot).start()
+
     app.run(debug=False, use_reloader=False)

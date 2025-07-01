@@ -1,11 +1,6 @@
 from telegram import Update
-from telegram.ext import (
-    ApplicationBuilder,
-    CommandHandler,
-    ContextTypes,
-    MessageHandler,
-    filters
-)
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
+import yt_dlp
 
 import os
 import yt_dlp
@@ -241,11 +236,13 @@ def generate_qr():
     return send_file(buf, mimetype='image/png')
 
 # ✅ Telegram Bot
-BOT_TOKEN = "7694345842:AAEtJ8ympGE8EYX_LwPAgwBoypvpbcuG22I"
+BOT_TOKEN = "7694345842:AAEtJ8ympGE8EYX_LwPAgwBoypvpbcuG22I"  # replace with your real bot token
 
+# 🔹 /start command handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("🎥 Send me any video URL and I'll download it!")
+    await update.message.reply_text("🎥 Send me any video URL and I'll download it for you!")
 
+# 🔹 Handle video URL
 async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = update.message.text.strip()
     msg = await update.message.reply_text("⏳ Processing your request...")
@@ -270,14 +267,17 @@ async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await msg.edit_text(f"❌ Failed to download video.\n\nError: `{str(e)}`", parse_mode="Markdown")
 
+# 🔹 Run bot in separate thread
 def run_bot():
     import asyncio
+
     async def main():
-        bot_app = ApplicationBuilder().token(BOT_TOKEN).build()
-        bot_app.add_handler(CommandHandler("start", start))
-        bot_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_url))
+        app = ApplicationBuilder().token(BOT_TOKEN).build()
+        app.add_handler(CommandHandler("start", start))
+        app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_url))
         print("✅ Telegram Bot is running...")
-        await bot_app.run_polling()
+        await app.run_polling()
+
     asyncio.run(main())
 
 # ✅ Final Execution Block

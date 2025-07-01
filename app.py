@@ -82,7 +82,7 @@ async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await msg.edit_text(f"\u274c Failed to download video.\n\nError: `{str(e)}`", parse_mode="Markdown")
 
 def run_telegram_bot():
-    tg_app = ApplicationBuilder().token(BOT_TOKEN).build()
+    tg_app = ApplicationBuilder().token(AAEtJ8ympGE8EYX_LwPAgwBoypvpbcuG22I).build()
     tg_app.add_handler(CommandHandler("start", start))
     tg_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_url))
     print("\u2705 Telegram bot is running...")

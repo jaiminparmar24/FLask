@@ -1,16 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file
-from flask_mail import Mail, Message
-
-import pytz
-import random
-import os
-import time
-import sqlite3
-import requests
-from datetime import datetime
-import qrcode
-import io
+from telegram import Update
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters
+)
 import yt_dlp
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file
 
 
 app = Flask(__name__)
@@ -259,9 +256,11 @@ def generate_qr():
 BOT_TOKEN = "7694345842:AAEtJ8ympGE8EYX_LwPAgwBoypvpbcuG22I"  # keep this secure
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     await update.message.reply_text("🎥 Send me any video URL and I'll download it!")
 
-async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     url = update.message.text.strip()
     msg = await update.message.reply_text("⏳ Processing your request...")
 

@@ -6,9 +6,19 @@ from telegram.ext import (
     MessageHandler,
     filters
 )
-import yt_dlp
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file
 
+import os
+import yt_dlp
+import sqlite3
+import pytz
+import time
+import qrcode
+import io
+import requests
+from datetime import datetime
+
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -38,7 +48,6 @@ app.config.update(
     MAIL_PASSWORD=os.environ.get('MAIL_PASSWORD', 'your_app_password'),
     MAIL_DEFAULT_SENDER=os.environ.get('MAIL_USERNAME', 'your_email@gmail.com')
 )
-
 mail = Mail(app)
 
 # ✅ SQLite DB Setup
@@ -74,7 +83,7 @@ def update_last_login(email):
 # ✅ Google Script Logger
 def send_to_google_script(email, status):
     try:
-        url = "https://script.google.com/macros/s/AKfycbye0Ky4KMKw1O3oQj3ctxqpDPyIZu8PyEn8mt7pQOUiLkqvSZ4OUi-oshm2XEUs8PdMjw/exec"
+        url = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
         login_time = session.get('login_time') or datetime.now(pytz.timezone("Asia/Kolkata"))
         data = {
             "email": email,
@@ -112,22 +121,17 @@ def send_otp(email):
 
     msg.html = f"""<!DOCTYPE html>
     <html><head><style>
-    body {{ font-family: 'Segoe UI'; background: #f4f4f4; margin: 0; padding: 0; }}
-    .container {{
-      background: #fff; padding: 30px; max-width: 600px; margin: 30px auto;
-      border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    }}
+    body {{ font-family: 'Segoe UI'; background: #f4f4f4; }}
+    .container {{ background: #fff; padding: 30px; max-width: 600px; margin: 30px auto;
+      border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }}
     .otp-box {{
       font-size: 26px; letter-spacing: 8px; background: #222; color: #fff;
       padding: 15px; border-radius: 10px; text-align: center; margin: 20px 0;
     }}
     .footer {{ font-size: 13px; color: #888; text-align: center; margin-top: 30px; }}
-    </style></head>
-    <body>
-    <div class="container">
+    </style></head><body><div class="container">
       <h2 style="color:#20B2AA;">🔐 JAIMIN Login OTP</h2>
-      <p>Hello,</p>
-      <p>We received a login request for: <b>{email}</b></p>
+      <p>Hello,</p><p>We received a login request for: <b>{email}</b></p>
       <p>Enter this OTP to continue:</p>
       <div class="otp-box">{otp}</div>
       <p>This OTP is valid for 5 minutes.</p>
@@ -139,9 +143,8 @@ def send_otp(email):
         print(f"✅ OTP sent to {email}: {otp}")
     except Exception as e:
         print("❌ Email failed:", e)
-        raise e
 
-# ✅ Routes
+# ✅ Login Routes
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
@@ -199,7 +202,6 @@ def verify():
 def dashboard():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-
     last_login = get_last_login(session['email'])
     return render_template('dashboard.html', email=session['email'], last_login=last_login)
 
@@ -215,14 +217,13 @@ def logout():
 def maintenance():
     return render_template("maintenance.html"), 503
 
-# ✅ QR Code Generator Route
+# ✅ QR Code Generator
 @app.route('/generate_qr', methods=['POST'])
 def generate_qr():
     url = request.form.get('url')
     if not url:
         return "No URL provided", 400
 
-    # Generate QR Code
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -233,34 +234,19 @@ def generate_qr():
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
 
-    # Save to memory buffer
     buf = io.BytesIO()
     img.save(buf)
     buf.seek(0)
 
-    # Optional Google Sheet logging (you can use same or separate sheet)
-    try:
-        requests.post(
-            "https://script.google.com/macros/s/YOUR_SECOND_SCRIPT_ID/exec",  # Optional logging
-            json={
-                "url": url,
-                "ip": request.remote_addr
-            }
-        )
-    except Exception as e:
-        print("QR log failed:", e)
-
     return send_file(buf, mimetype='image/png')
 
-# ✅ Telegram Bot Setup
-BOT_TOKEN = "7694345842:AAEtJ8ympGE8EYX_LwPAgwBoypvpbcuG22I"  # keep this secure
+# ✅ Telegram Bot
+BOT_TOKEN = "7694345842:AAEtJ8ympGE8EYX_LwPAgwBoypvpbcuG22I"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
     await update.message.reply_text("🎥 Send me any video URL and I'll download it!")
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
+async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = update.message.text.strip()
     msg = await update.message.reply_text("⏳ Processing your request...")
 
@@ -287,11 +273,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def run_bot():
     import asyncio
     async def main():
-        app = ApplicationBuilder().token(BOT_TOKEN).build()
-        app.add_handler(CommandHandler("start", start))
-        app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_url))
-        print("✅ Bot is running...")
-        await app.run_polling()
+        bot_app = ApplicationBuilder().token(BOT_TOKEN).build()
+        bot_app.add_handler(CommandHandler("start", start))
+        bot_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_url))
+        print("✅ Telegram Bot is running...")
+        await bot_app.run_polling()
     asyncio.run(main())
 
 # ✅ Final Execution Block

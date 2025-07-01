@@ -256,7 +256,7 @@ def generate_qr():
     return send_file(buf, mimetype='image/png')
 
 # ✅ Telegram Bot Setup
-BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"  # keep this secure
+BOT_TOKEN = "7694345842:AAEtJ8ympGE8EYX_LwPAgwBoypvpbcuG22I"  # keep this secure
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("🎥 Send me any video URL and I'll download it!")

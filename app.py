@@ -10,7 +10,7 @@ import requests
 from datetime import datetime
 import qrcode
 import io
-
+import yt_dlp
 
 
 app = Flask(__name__)

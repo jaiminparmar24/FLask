@@ -1,26 +1,22 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file
 from flask_mail import Mail, Message
-from datetime import datetime, timedelta
+
 import pytz
 import random
 import os
 import time
 import sqlite3
 import requests
+from datetime import datetime
 import qrcode
 import io
 
-# ✅ App Setup
+
+
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
-app.permanent_session_lifetime = timedelta(days=365 * 100)  # ≈ 100 years
 
-# ✅ (Optional) Flask-Session Setup
-# from flask_session import Session
-# app.config['SESSION_TYPE'] = 'filesystem'
-# Session(app)
-
-# ✅ Static robots.txt and sitemap.xml
+# ✅ Robots.txt and Sitemap.xml Routes
 @app.route("/robots.txt")
 def robots():
     return send_from_directory("static", "robots.txt")
@@ -45,9 +41,10 @@ app.config.update(
     MAIL_PASSWORD=os.environ.get('MAIL_PASSWORD', 'your_app_password'),
     MAIL_DEFAULT_SENDER=os.environ.get('MAIL_USERNAME', 'your_email@gmail.com')
 )
+
 mail = Mail(app)
 
-# ✅ SQLite Setup
+# ✅ SQLite DB Setup
 def init_db():
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
@@ -77,7 +74,7 @@ def update_last_login(email):
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
 
-# ✅ Google Sheet Logger
+# ✅ Google Script Logger
 def send_to_google_script(email, status):
     try:
         url = "https://script.google.com/macros/s/AKfycbye0Ky4KMKw1O3oQj3ctxqpDPyIZu8PyEn8mt7pQOUiLkqvSZ4OUi-oshm2XEUs8PdMjw/exec"
@@ -91,7 +88,7 @@ def send_to_google_script(email, status):
     except Exception as e:
         print("❌ Google Sheet log failed:", e)
 
-# ✅ OTP Sender
+# ✅ OTP Email Sender
 def send_otp(email):
     session.pop('otp', None)
     session.pop('otp_time', None)
@@ -115,6 +112,7 @@ def send_otp(email):
     )
 
     msg.body = f"Your OTP is: {otp}"
+
     msg.html = f"""<!DOCTYPE html>
     <html><head><style>
     body {{ font-family: 'Segoe UI'; background: #f4f4f4; margin: 0; padding: 0; }}
@@ -135,8 +133,7 @@ def send_otp(email):
       <p>We received a login request for: <b>{email}</b></p>
       <p>Enter this OTP to continue:</p>
       <div class="otp-box">{otp}</div>
-      <p>This OTP is valid for 5 minutes.Please do not share it with anyone</p>
-      <p>If you didn't request this,simply ignore this email.</P>
+      <p>This OTP is valid for 5 minutes.</p>
       <div class="footer">Securely sent by JAIMIN 🚀</div>
     </div></body></html>"""
 
@@ -148,7 +145,6 @@ def send_otp(email):
         raise e
 
 # ✅ Routes
-
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
@@ -158,8 +154,6 @@ def login():
         email = request.form.get('email', '').strip()
         if not email:
             return render_template('login.html', error="Please enter a valid email.")
-        
-        session.permanent = True  # ✅ Added for session stability
         session['email'] = email
 
         if session.get('verified') and session['email'] == email:
@@ -184,7 +178,7 @@ def verify():
         user_otp = request.form.get('otp', '').strip()
         otp_time = session.get('otp_time')
 
-        if not session.get('otp') or not otp_time or (time.time() - otp_time > 300):
+        if not session.get('otp') or (time.time() - otp_time > 300):
             session.pop('otp', None)
             return render_template('verify.html', error="⏰ OTP expired. Please login again.")
 
@@ -224,12 +218,14 @@ def logout():
 def maintenance():
     return render_template("maintenance.html"), 503
 
+# ✅ QR Code Generator Route
 @app.route('/generate_qr', methods=['POST'])
 def generate_qr():
     url = request.form.get('url')
     if not url:
         return "No URL provided", 400
 
+    # Generate QR Code
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -240,19 +236,67 @@ def generate_qr():
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
 
+    # Save to memory buffer
     buf = io.BytesIO()
     img.save(buf)
     buf.seek(0)
 
+    # Optional Google Sheet logging (you can use same or separate sheet)
     try:
         requests.post(
-            "https://script.google.com/macros/s/YOUR_SECOND_SCRIPT_ID/exec",
-            json={"url": url, "ip": request.remote_addr}
+            "https://script.google.com/macros/s/YOUR_SECOND_SCRIPT_ID/exec",  # Optional logging
+            json={
+                "url": url,
+                "ip": request.remote_addr
+            }
         )
     except Exception as e:
         print("QR log failed:", e)
 
     return send_file(buf, mimetype='image/png')
 
+# ✅ Telegram Bot Setup
+BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"  # keep this secure
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("🎥 Send me any video URL and I'll download it!")
+
+async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    url = update.message.text.strip()
+    msg = await update.message.reply_text("⏳ Processing your request...")
+
+    output_path = "video.%(ext)s"
+
+    try:
+        ydl_opts = {
+            'outtmpl': output_path,
+            'format': 'best[ext=mp4]',
+            'merge_output_format': 'mp4',
+            'quiet': True,
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            video_file = ydl.prepare_filename(info)
+
+        await update.message.reply_video(video=open(video_file, 'rb'), caption="✅ Here's your video!")
+        await msg.delete()
+        os.remove(video_file)
+
+    except Exception as e:
+        await msg.edit_text(f"❌ Failed to download video.\n\nError: `{str(e)}`", parse_mode="Markdown")
+
+def run_bot():
+    import asyncio
+    async def main():
+        app = ApplicationBuilder().token(BOT_TOKEN).build()
+        app.add_handler(CommandHandler("start", start))
+        app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_url))
+        print("✅ Bot is running...")
+        await app.run_polling()
+    asyncio.run(main())
+
+# ✅ Final Execution Block
 if __name__ == '__main__':
-    app.run(debug=False)  # ✅ Debug mode disabled to prevent auto restart
+    import threading
+    threading.Thread(target=run_bot, daemon=True).start()
+    app.run(debug=True)

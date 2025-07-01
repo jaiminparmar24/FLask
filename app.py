@@ -1,24 +1,122 @@
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
-import yt_dlp
-
-import os
-import yt_dlp
-import sqlite3
-import pytz
-import time
-import qrcode
-import io
-import requests
-from datetime import datetime
-
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file
 from flask_mail import Mail, Message
+from datetime import datetime, timedelta
+from telegram import Update
+from telegram.ext import (
+    ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
+)
+import threading
+import yt_dlp
+import pytz
+import random
+import os
+import time
+import sqlite3
+import requests
+import qrcode
+import io
 
+# ✅ Flask App Setup
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
+app.permanent_session_lifetime = timedelta(days=365 * 100)
 
-# ✅ Robots.txt and Sitemap.xml Routes
+# ✅ Mail Configuration
+app.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USE_SSL=False,
+    MAIL_USERNAME=os.environ.get('MAIL_USERNAME', 'your_email@gmail.com'),
+    MAIL_PASSWORD=os.environ.get('MAIL_PASSWORD', 'your_app_password'),
+    MAIL_DEFAULT_SENDER=os.environ.get('MAIL_USERNAME', 'your_email@gmail.com')
+)
+mail = Mail(app)
+
+# ✅ SQLite DB Init
+def init_db():
+    with sqlite3.connect('users.db') as conn:
+        c = conn.cursor()
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                email TEXT PRIMARY KEY,
+                last_login TIMESTAMP
+            )
+        ''')
+        conn.commit()
+init_db()
+
+# ✅ Telegram Bot Functions
+BOT_TOKEN = "7694345842:AAEtJ8ympGE8EYX_LwPAgwBoypvpbcuG22I"
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("\ud83c\udfa5 Send me any video URL and I'll download it!")
+
+async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    url = update.message.text.strip()
+    msg = await update.message.reply_text("\u23f3 Processing your request...")
+
+    output_path = "downloaded_video.%(ext)s"
+
+    try:
+        ydl_opts = {
+            'outtmpl': output_path,
+            'format': 'best[ext=mp4]',
+            'merge_output_format': 'mp4',
+            'quiet': True,
+        }
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            video_file = ydl.prepare_filename(info)
+
+        await update.message.reply_video(video=open(video_file, 'rb'), caption="\u2705 Here's your video!")
+        await msg.delete()
+
+        try:
+            os.remove(video_file)
+        except Exception as cleanup_error:
+            print(f"\u26a0\ufe0f File not removed: {cleanup_error}")
+
+    except Exception as e:
+        await msg.edit_text(f"\u274c Failed to download video.\n\nError: `{str(e)}`", parse_mode="Markdown")
+
+def run_telegram_bot():
+    tg_app = ApplicationBuilder().token(BOT_TOKEN).build()
+    tg_app.add_handler(CommandHandler("start", start))
+    tg_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_url))
+    print("\u2705 Telegram bot is running...")
+    tg_app.run_polling()
+
+# ✅ Basic Routes
+@app.route("/")
+def home():
+    return "<h1>Welcome to JAIMIN's Flask App with Telegram Bot</h1>"
+
+@app.route("/robots.txt")
+def robots():
+    return send_from_directory("static", "robots.txt")
+
+@app.route("/sitemap.xml")
+def sitemap():
+    return send_from_directory("static", "sitemap.xml")
+
+# ✅ Main Runner
+if __name__ == '__main__':
+    threading.Thread(target=run_telegram_bot).start()
+    app.run(debug=False)
+
+# ✅ App Setup
+app = Flask(__name__)
+app.secret_key = 'supersecretkey'
+app.permanent_session_lifetime = timedelta(days=365 * 100)  # ≈ 100 years
+
+# ✅ (Optional) Flask-Session Setup
+# from flask_session import Session
+# app.config['SESSION_TYPE'] = 'filesystem'
+# Session(app)
+
+# ✅ Static robots.txt and sitemap.xml
 @app.route("/robots.txt")
 def robots():
     return send_from_directory("static", "robots.txt")
@@ -45,7 +143,7 @@ app.config.update(
 )
 mail = Mail(app)
 
-# ✅ SQLite DB Setup
+# ✅ SQLite Setup
 def init_db():
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
@@ -75,10 +173,10 @@ def update_last_login(email):
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
 
-# ✅ Google Script Logger
+# ✅ Google Sheet Logger
 def send_to_google_script(email, status):
     try:
-        url = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
+        url = "https://script.google.com/macros/s/AKfycbye0Ky4KMKw1O3oQj3ctxqpDPyIZu8PyEn8mt7pQOUiLkqvSZ4OUi-oshm2XEUs8PdMjw/exec"
         login_time = session.get('login_time') or datetime.now(pytz.timezone("Asia/Kolkata"))
         data = {
             "email": email,
@@ -89,7 +187,7 @@ def send_to_google_script(email, status):
     except Exception as e:
         print("❌ Google Sheet log failed:", e)
 
-# ✅ OTP Email Sender
+# ✅ OTP Sender
 def send_otp(email):
     session.pop('otp', None)
     session.pop('otp_time', None)
@@ -113,23 +211,28 @@ def send_otp(email):
     )
 
     msg.body = f"Your OTP is: {otp}"
-
     msg.html = f"""<!DOCTYPE html>
     <html><head><style>
-    body {{ font-family: 'Segoe UI'; background: #f4f4f4; }}
-    .container {{ background: #fff; padding: 30px; max-width: 600px; margin: 30px auto;
-      border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }}
+    body {{ font-family: 'Segoe UI'; background: #f4f4f4; margin: 0; padding: 0; }}
+    .container {{
+      background: #fff; padding: 30px; max-width: 600px; margin: 30px auto;
+      border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }}
     .otp-box {{
       font-size: 26px; letter-spacing: 8px; background: #222; color: #fff;
       padding: 15px; border-radius: 10px; text-align: center; margin: 20px 0;
     }}
     .footer {{ font-size: 13px; color: #888; text-align: center; margin-top: 30px; }}
-    </style></head><body><div class="container">
+    </style></head>
+    <body>
+    <div class="container">
       <h2 style="color:#20B2AA;">🔐 JAIMIN Login OTP</h2>
-      <p>Hello,</p><p>We received a login request for: <b>{email}</b></p>
+      <p>Hello,</p>
+      <p>We received a login request for: <b>{email}</b></p>
       <p>Enter this OTP to continue:</p>
       <div class="otp-box">{otp}</div>
-      <p>This OTP is valid for 5 minutes.</p>
+      <p>This OTP is valid for 5 minutes.Please do not share it with anyone</p>
+      <p>If you didn't request this,simply ignore this email.</P>
       <div class="footer">Securely sent by JAIMIN 🚀</div>
     </div></body></html>"""
 
@@ -138,8 +241,10 @@ def send_otp(email):
         print(f"✅ OTP sent to {email}: {otp}")
     except Exception as e:
         print("❌ Email failed:", e)
+        raise e
 
-# ✅ Login Routes
+# ✅ Routes
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
@@ -149,6 +254,8 @@ def login():
         email = request.form.get('email', '').strip()
         if not email:
             return render_template('login.html', error="Please enter a valid email.")
+        
+        session.permanent = True  # ✅ Added for session stability
         session['email'] = email
 
         if session.get('verified') and session['email'] == email:
@@ -173,7 +280,7 @@ def verify():
         user_otp = request.form.get('otp', '').strip()
         otp_time = session.get('otp_time')
 
-        if not session.get('otp') or (time.time() - otp_time > 300):
+        if not session.get('otp') or not otp_time or (time.time() - otp_time > 300):
             session.pop('otp', None)
             return render_template('verify.html', error="⏰ OTP expired. Please login again.")
 
@@ -197,6 +304,7 @@ def verify():
 def dashboard():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
+
     last_login = get_last_login(session['email'])
     return render_template('dashboard.html', email=session['email'], last_login=last_login)
 
@@ -212,7 +320,6 @@ def logout():
 def maintenance():
     return render_template("maintenance.html"), 503
 
-# ✅ QR Code Generator
 @app.route('/generate_qr', methods=['POST'])
 def generate_qr():
     url = request.form.get('url')
@@ -233,55 +340,15 @@ def generate_qr():
     img.save(buf)
     buf.seek(0)
 
+    try:
+        requests.post(
+            "https://script.google.com/macros/s/YOUR_SECOND_SCRIPT_ID/exec",
+            json={"url": url, "ip": request.remote_addr}
+        )
+    except Exception as e:
+        print("QR log failed:", e)
+
     return send_file(buf, mimetype='image/png')
 
-# ✅ Telegram Bot
-BOT_TOKEN = "7694345842:AAEtJ8ympGE8EYX_LwPAgwBoypvpbcuG22I"  # replace with your real bot token
-
-# 🔹 /start command handler
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("🎥 Send me any video URL and I'll download it for you!")
-
-# 🔹 Handle video URL
-async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    url = update.message.text.strip()
-    msg = await update.message.reply_text("⏳ Processing your request...")
-
-    output_path = "video.%(ext)s"
-
-    try:
-        ydl_opts = {
-            'outtmpl': output_path,
-            'format': 'best[ext=mp4]',
-            'merge_output_format': 'mp4',
-            'quiet': True,
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
-            video_file = ydl.prepare_filename(info)
-
-        await update.message.reply_video(video=open(video_file, 'rb'), caption="✅ Here's your video!")
-        await msg.delete()
-        os.remove(video_file)
-
-    except Exception as e:
-        await msg.edit_text(f"❌ Failed to download video.\n\nError: `{str(e)}`", parse_mode="Markdown")
-
-# 🔹 Run bot in separate thread
-def run_bot():
-    import asyncio
-
-    async def main():
-        app = ApplicationBuilder().token(BOT_TOKEN).build()
-        app.add_handler(CommandHandler("start", start))
-        app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_url))
-        print("✅ Telegram Bot is running...")
-        await app.run_polling()
-
-    asyncio.run(main())
-
-# ✅ Final Execution Block
 if __name__ == '__main__':
-    import threading
-    threading.Thread(target=run_bot, daemon=True).start()
-    app.run(debug=True)
+    app.run(debug=False)  # ✅ Debug mode disabled to prevent auto restart

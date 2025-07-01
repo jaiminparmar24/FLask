@@ -1,4 +1,4 @@
-# JAIMIN Login Portal 🔐
+# JAIMIN PARMAR Login Portal 🔐
 
 Welcome to the **secure email OTP login system** built using Flask, Python, and Render.
 

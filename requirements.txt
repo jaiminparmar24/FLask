@@ -1,1 +1,1 @@
-FlaskFlask-MailpytzrequestsgunicornqrcodePillow
+FlaskFlask-MailpytzrequestsgunicornqrcodePillowpython-telegram-bot==20.3

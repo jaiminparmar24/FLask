@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file
 from flask_mail import Mail, Message
-from datetime import datetime, timedelta
 
 import pytz
 import random
@@ -8,26 +7,42 @@ import os
 import time
 import sqlite3
 import requests
+from datetime import datetime
 import qrcode
 import io
 
-# === Flask Setup ===
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
-app.permanent_session_lifetime = timedelta(days=365 * 100)
 
-# === Flask Mail Setup ===
+# ✅ Robots.txt and Sitemap.xml Routes
+@app.route("/robots.txt")
+def robots():
+    return send_from_directory("static", "robots.txt")
+
+@app.route("/sitemap.xml")
+def sitemap():
+    return send_from_directory("static", "sitemap.xml")
+
+# ✅ Maintenance Mode
+@app.before_request
+def check_maintenance():
+    if os.environ.get('MAINTENANCE_MODE') == 'on' and request.endpoint != 'maintenance':
+        return render_template('maintenance.html'), 503
+
+# ✅ Mail Configuration
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
+    MAIL_USE_SSL=False,
     MAIL_USERNAME=os.environ.get('MAIL_USERNAME', 'your_email@gmail.com'),
     MAIL_PASSWORD=os.environ.get('MAIL_PASSWORD', 'your_app_password'),
     MAIL_DEFAULT_SENDER=os.environ.get('MAIL_USERNAME', 'your_email@gmail.com')
 )
+
 mail = Mail(app)
 
-# === SQLite Setup ===
+# ✅ SQLite DB Setup
 def init_db():
     with sqlite3.connect('users.db') as conn:
         c = conn.cursor()
@@ -38,6 +53,7 @@ def init_db():
             )
         ''')
         conn.commit()
+
 init_db()
 
 def get_last_login(email):
@@ -56,10 +72,10 @@ def update_last_login(email):
         c.execute("INSERT OR REPLACE INTO users (email, last_login) VALUES (?, ?)", (email, now))
         conn.commit()
 
-# === Google Sheet Logger ===
+# ✅ Google Script Logger
 def send_to_google_script(email, status):
     try:
-        url = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
+        url = "https://script.google.com/macros/s/AKfycbye0Ky4KMKw1O3oQj3ctxqpDPyIZu8PyEn8mt7pQOUiLkqvSZ4OUi-oshm2XEUs8PdMjw/exec"
         login_time = session.get('login_time') or datetime.now(pytz.timezone("Asia/Kolkata"))
         data = {
             "email": email,
@@ -70,11 +86,11 @@ def send_to_google_script(email, status):
     except Exception as e:
         print("❌ Google Sheet log failed:", e)
 
-# === OTP Email Sender ===
+# ✅ OTP Email Sender
 def send_otp(email):
     session.pop('otp', None)
     session.pop('otp_time', None)
-    
+
     otp = str(random.randint(1000, 9999))
     session.update({
         'otp': otp,
@@ -83,96 +99,159 @@ def send_otp(email):
         'otp_attempts': 0
     })
 
+    time_now = datetime.now(pytz.timezone("Asia/Kolkata")).strftime("%d %B %Y, %I:%M %p")
+    subject = f"🔐 Your OTP for JAIMIN's Login – {time_now}"
+
     msg = Message(
-        subject=f"🔐 Your OTP for JAIMIN's Login",
-        recipients=[email]
+        subject=subject,
+        recipients=[email],
+        reply_to="noreply@example.com",
+        extra_headers={"X-Priority": "1", "X-MSMail-Priority": "High"}
     )
+
     msg.body = f"Your OTP is: {otp}"
-    msg.html = f"""
-    <html><body>
-    <h2>JAIMIN Login OTP</h2>
-    <p>We received a login request for: <b>{email}</b></p>
-    <p>Enter this OTP to continue:</p>
-    <div style='font-size:24px;font-weight:bold;'>{otp}</div>
-    <p>This OTP is valid for 5 minutes. Do not share it.</p>
-    </body></html>
-    """
+
+    msg.html = f"""<!DOCTYPE html>
+    <html><head><style>
+    body {{ font-family: 'Segoe UI'; background: #f4f4f4; margin: 0; padding: 0; }}
+    .container {{
+      background: #fff; padding: 30px; max-width: 600px; margin: 30px auto;
+      border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }}
+    .otp-box {{
+      font-size: 26px; letter-spacing: 8px; background: #222; color: #fff;
+      padding: 15px; border-radius: 10px; text-align: center; margin: 20px 0;
+    }}
+    .footer {{ font-size: 13px; color: #888; text-align: center; margin-top: 30px; }}
+    </style></head>
+    <body>
+    <div class="container">
+      <h2 style="color:#20B2AA;">🔐 JAIMIN Login OTP</h2>
+      <p>Hello,</p>
+      <p>We received a login request for: <b>{email}</b></p>
+      <p>Enter this OTP to continue:</p>
+      <div class="otp-box">{otp}</div>
+      <p>This OTP is valid for 5 minutes.</p>
+      <div class="footer">Securely sent by JAIMIN 🚀</div>
+    </div></body></html>"""
+
     try:
         mail.send(msg)
         print(f"✅ OTP sent to {email}: {otp}")
     except Exception as e:
-        print("❌ Failed to send email:", e)
+        print("❌ Email failed:", e)
+        raise e
 
-
-# === Flask Routes ===
+# ✅ Routes
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
         return redirect(url_for('dashboard'))
+
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
         if not email:
-            return render_template('login.html', error="Enter a valid email")
+            return render_template('login.html', error="Please enter a valid email.")
         session['email'] = email
-        send_otp(email)
-        return redirect(url_for('verify'))
+
+        if session.get('verified') and session['email'] == email:
+            session['logged_in'] = True
+            return redirect(url_for('dashboard'))
+        else:
+            send_otp(email)
+            return redirect(url_for('verify'))
+
     return render_template('login.html')
 
 @app.route('/verify', methods=['GET', 'POST'])
 def verify():
+    if session.get('logged_in'):
+        return redirect(url_for('dashboard'))
+
     if request.method == 'POST':
+        if 'resend' in request.form:
+            send_otp(session.get('email'))
+            return redirect(url_for('verify'))
+
         user_otp = request.form.get('otp', '').strip()
-        if not session.get('otp') or (time.time() - session['otp_time'] > 300):
-            return render_template('verify.html', error="OTP expired. Please login again.")
-        if user_otp == session['otp']:
+        otp_time = session.get('otp_time')
+
+        if not session.get('otp') or (time.time() - otp_time > 300):
+            session.pop('otp', None)
+            return render_template('verify.html', error="⏰ OTP expired. Please login again.")
+
+        if user_otp == session.get('otp'):
             session.update({
                 'verified': True,
                 'logged_in': True,
-                'login_time': datetime.now(pytz.timezone("Asia/Kolkata"))
+                'login_time': datetime.now(pytz.timezone("Asia/Kolkata")),
+                'ip': request.remote_addr,
+                'browser': request.user_agent.string
             })
             update_last_login(session['email'])
             send_to_google_script(session['email'], "Login")
             return redirect(url_for('dashboard'))
         else:
-            return render_template('verify.html', error="Invalid OTP")
+            return render_template('verify.html', error="Invalid OTP. Try again!")
+
     return render_template('verify.html')
 
 @app.route('/dashboard')
 def dashboard():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
+
     last_login = get_last_login(session['email'])
     return render_template('dashboard.html', email=session['email'], last_login=last_login)
 
 @app.route('/logout')
 def logout():
-    send_to_google_script(session.get('email'), "Logout")
+    email = session.get('email', 'Unknown')
+    session['login_time'] = datetime.now(pytz.timezone("Asia/Kolkata"))
+    send_to_google_script(email, "Logout")
     session.clear()
     return redirect(url_for('login'))
 
+@app.route('/maintenance')
+def maintenance():
+    return render_template("maintenance.html"), 503
+
+# ✅ QR Code Generator Route
 @app.route('/generate_qr', methods=['POST'])
 def generate_qr():
     url = request.form.get('url')
     if not url:
-        return "Missing URL", 400
-    qr = qrcode.make(url)
+        return "No URL provided", 400
+
+    # Generate QR Code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    # Save to memory buffer
     buf = io.BytesIO()
-    qr.save(buf)
+    img.save(buf)
     buf.seek(0)
+
+    # Optional Google Sheet logging (you can use same or separate sheet)
+    try:
+        requests.post(
+            "https://script.google.com/macros/s/YOUR_SECOND_SCRIPT_ID/exec",  # Optional logging
+            json={
+                "url": url,
+                "ip": request.remote_addr
+            }
+        )
+    except Exception as e:
+        print("QR log failed:", e)
+
     return send_file(buf, mimetype='image/png')
 
-@app.route('/robots.txt')
-def robots():
-    return send_from_directory("static", "robots.txt")
-
-@app.route('/sitemap.xml')
-def sitemap():
-    return send_from_directory("static", "sitemap.xml")
-
-@app.route('/maintenance')
-def maintenance():
-    return render_template('maintenance.html'), 503
-
 if __name__ == '__main__':
-
-    app.run(debug=False, use_reloader=False)
+    app.run(debug=True)

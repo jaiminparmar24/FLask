@@ -132,6 +132,7 @@ def send_otp(email):
       <p>Enter this OTP to continue:</p>
       <div class="otp-box">{otp}</div>
       <p>This OTP is valid for 5 minutes.</p>
+        <p>If you didn’t request this, you can safely ignore this email.</p>
       <div class="footer">Securely sent by JAIMIN 🚀</div>
     </div></body></html>"""
 

@@ -239,16 +239,16 @@ No passwords•No risks•Just access
 
   </main>
 
-  <script>
-    // Typing animation
-    new Typed('#typed-text', {
-      strings: ["Welcome Back!", "Secure OTP Login", "JAIMIN PARMAR Portal"],
-      typeSpeed: 50,
-      backSpeed: 30,
-      loop: true
-    });
+ <script>
+  new Typed('#typed-text', {
+    strings: ["JAIMIN PARMAR's Login"],  // ✅ Wrap in double quotes
+    typeSpeed: 50,
+    backSpeed: 0,
+    loop: false,
+    showCursor: false
+  });
 
-    // Email validation
+// Email validation
     const emailInput = document.getElementById('email');
     emailInput.addEventListener('input', () => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

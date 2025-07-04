@@ -43,6 +43,21 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
 
   <style>
+    .profile-pic {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto 20px;
+  display: block;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border: 3px solid #0077cc;
+}
+
+body.dark .profile-pic {
+  border-color: #00aaff;
+}
+
     * {
       margin: 0;
       padding: 0;
@@ -203,7 +218,8 @@
 
 <body>
   <main class="card">
-    <h1><span id="typed-text"></span></h1>
+    <img src="https://i.postimg.cc/13QnB9zQ/cropped-circle-image.png" alt="Profile Photo" class="profile-pic" />
+  <h1><span id="typed-text"></span></h1>
     <div class="summary">
       Welcome to our login page.<br>
       <strong style="color:#0077cc;">Designed by JAIMIN</strong>
